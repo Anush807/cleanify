@@ -26,8 +26,19 @@ except Exception as e:
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = secrets.token_hex(32)
-
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 # ── CORS ──
+# Handle ALL OPTIONS requests globally
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        response = app.make_default_options_response()
+        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+        response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,PATCH,DELETE,OPTIONS'
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        return response
+
 CORS(app, supports_credentials=True,
      origins=["https://cleanify-frontend-eight.vercel.app",
                "http://localhost:5500", "http://127.0.0.1:5500"])
