@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waste Picker Schedule - Cleanify</title>
+    <link rel="stylesheet" href="./user.css">
+</head>
+<body>
+    <nav>
+        <h2>🌿 CLEANIFY</h2>
+        <ul>
+            <li><a href='./user.html'>Home</a></li>
+            <li><a href='./report.html'>Report Issue</a></li>
+            <li><a href='./ai.html'>AI Classifier</a></li>
+            <li><a href='./eco.html'>Eco Store</a></li>
+            <li><a href='./reward.html'>Rewards</a></li>
+            <li><button onclick="logout()" style="background:none;border:1px solid rgba(255,255,255,0.4);color:white;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;">🚪 Logout</button></li>
+        </ul>
+    </nav>
+
+    <div id="map">
+        <div style="text-align:center;width:100%;">
+            <div style="font-size:60px;margin-bottom:20px;">🗺️</div>
+            <h2 style="color:#1a7f44;">Live Waste Picker Tracking</h2>
+            <p style="color:#666;margin:10px 0 25px;" id="areaLabel">Loading your area...</p>
+
+            <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:30px;">
+                <div style="background:white;padding:20px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1);min-width:150px;">
+                    <div style="font-size:30px;">🚛</div>
+                    <strong style="color:#1a7f44;" id="truckNum">Loading...</strong>
+                    <p style="font-size:12px;color:#666;" id="truckEta">—</p>
+                </div>
+                <div style="background:white;padding:20px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1);min-width:150px;">
+                    <div style="font-size:30px;">📍</div>
+                    <strong style="color:#1a7f44;">Your Area</strong>
+                    <p style="font-size:12px;color:#666;" id="userArea">—</p>
+                </div>
+                <div style="background:white;padding:20px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1);min-width:150px;">
+                    <div style="font-size:30px;">📅</div>
+                    <strong style="color:#1a7f44;">Schedule</strong>
+                    <p style="font-size:12px;color:#666;" id="scheduleDays">—</p>
+                </div>
+                <div style="background:white;padding:20px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1);min-width:150px;">
+                    <div style="font-size:30px;">⏰</div>
+                    <strong style="color:#1a7f44;">Next Pickup</strong>
+                    <p style="font-size:12px;color:#666;" id="nextPickup">—</p>
+                </div>
+            </div>
+
+            <div style="max-width:700px;margin:0 auto;">
+                <h3 style="color:#1a7f44;margin-bottom:15px;">🚿 Reported Facility Status</h3>
+                <div id="facilityList"><p style="color:#999;">Loading...</p></div>
+            </div>
+        </div>
+    </div>
+
+    <footer><p>© 2026 Swachhta Platform | Built for a Clean India 🇮🇳</p></footer>
+
+    <script>
+        const API = '';
+        function getToken() { return localStorage.getItem('cleanify_token'); }
+        function logout() {
+            fetch(`${API}/api/auth/logout`,{method:'POST',headers:{'Authorization':'Bearer '+getToken()}});
+            localStorage.clear(); window.location.href='./index.html';
+        }
+        if (!getToken()) { window.location.href='./index.html'; }
+
+        async function loadSchedule() {
+            try {
+                const res = await fetch(`${API}/api/schedule`,{headers:{'Authorization':'Bearer '+getToken()}});
+                if (res.status===401){window.location.href='./index.html';return;}
+                const data = await res.json();
+
+                document.getElementById('areaLabel').textContent = `Pickup info for: ${data.area}`;
+                document.getElementById('truckNum').textContent = `Truck #${data.truck_number}`;
+                document.getElementById('truckEta').textContent = `ETA: ${data.eta_minutes} mins`;
+                document.getElementById('userArea').textContent = data.area;
+                document.getElementById('scheduleDays').textContent = data.schedule_days.join(', ');
+                document.getElementById('nextPickup').textContent = data.next_pickup;
+
+                const facilityEl = document.getElementById('facilityList');
+                if (!data.facilities || !data.facilities.length) {
+                    facilityEl.innerHTML = `<div style="padding:20px;background:white;border-radius:12px;color:#999;text-align:center;">No washroom complaints yet. Facility status will appear here once issues are reported.</div>`;
+                } else {
+                    facilityEl.innerHTML = data.facilities.map(f => `
+                        <div style="display:flex;justify-content:space-between;align-items:center;background:white;padding:15px 20px;border-radius:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                            <div style="text-align:left;">
+                                <strong style="font-size:14px;">${f.name}</strong>
+                                <p style="font-size:12px;color:#666;margin:2px 0;">Last updated: ${f.last}</p>
+                            </div>
+                            <span style="font-size:14px;font-weight:600;">${f.icon} ${f.status}</span>
+                        </div>`).join('');
+                }
+            } catch(err) {
+                document.getElementById('areaLabel').textContent = 'Unable to load schedule.';
+            }
+        }
+        window.addEventListener('DOMContentLoaded', loadSchedule);
+    </script>
+</body>
+</html>

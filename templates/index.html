@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - CLEANIFY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f2b1a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: -10%; left: -10%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(76,175,80,0.5) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: blob1 18s ease-in-out infinite;
+            z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -15%; right: -10%;
+            width: 450px; height: 450px;
+            background: radial-gradient(circle, rgba(0,200,120,0.45) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: blob2 22s ease-in-out infinite;
+            z-index: 0;
+        }
+        @keyframes blob1 { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(80px,60px) scale(1.15);} 66%{transform:translate(-40px,100px) scale(0.9);} }
+        @keyframes blob2 { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(-70px,-50px) scale(1.1);} 66%{transform:translate(50px,-80px) scale(0.95);} }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+        @keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+        @keyframes spin { to{transform:rotate(360deg);} }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        .login-container {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            background: rgba(255,255,255,0.08);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.15);
+            backdrop-filter: blur(24px);
+        }
+        .login-branding {
+            background: linear-gradient(135deg, rgba(46,125,79,0.45) 0%, rgba(27,94,54,0.35) 100%);
+            backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(255,255,255,0.08);
+            padding: 45px 38px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+        }
+        .brand-header { display:flex;align-items:center;gap:12px;margin-bottom:20px; }
+        .brand-header .logo-icon { font-size:2.5rem;animation:bounce 2s ease-in-out infinite; }
+        .brand-header .logo-text { font-size:1.4rem;font-weight:700;color:white;letter-spacing:0.5px; }
+        .brand-content h1 { font-size:2rem;color:white;margin-bottom:15px;line-height:1.3; }
+        .brand-content p { font-size:0.93rem;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:25px; }
+        .features-list { list-style:none;display:flex;flex-direction:column;gap:14px; }
+        .features-list li {
+            display:flex;align-items:center;gap:12px;font-size:0.92rem;color:rgba(255,255,255,0.9);
+            padding:10px 14px;background:rgba(255,255,255,0.06);border-radius:10px;
+            border:1px solid rgba(255,255,255,0.08);transition:all 0.3s ease;
+        }
+        .features-list li:hover { background:rgba(255,255,255,0.1);transform:translateX(4px); }
+        .feature-icon { font-size:1.3rem;flex-shrink:0; }
+
+        .login-form-wrapper {
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .form-header { margin-bottom:28px; }
+        .form-header h2 { font-size:1.6rem;color:white;margin-bottom:6px;font-weight:700; }
+        .form-header p { font-size:0.88rem;color:rgba(255,255,255,0.65); }
+
+        .form-group { margin-bottom:18px; }
+        .form-group label { display:block;font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.9);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px; }
+        .input-wrapper { position:relative; }
+        .input-icon { position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1rem;opacity:0.5;pointer-events:none; }
+        .input-wrapper input {
+            width:100%;padding:13px 14px 13px 42px;
+            border:1.5px solid rgba(255,255,255,0.18);border-radius:12px;
+            background:rgba(255,255,255,0.1);backdrop-filter:blur(6px);
+            color:white;font-size:0.92rem;font-family:'Inter',sans-serif;
+            transition:all 0.35s;
+        }
+        .input-wrapper input::placeholder { color:rgba(255,255,255,0.45); }
+        .input-wrapper input:focus { outline:none;border-color:#4caf50;background:rgba(255,255,255,0.1);box-shadow:0 0 0 4px rgba(76,175,80,0.15); }
+        .toggle-password {
+            position:absolute;right:14px;top:50%;transform:translateY(-50%);
+            background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:1rem;
+        }
+        .toggle-password:hover { color:rgba(255,255,255,0.8); }
+
+        .login-btn {
+            width:100%;padding:14px;
+            background:linear-gradient(135deg,#43a047 0%,#2e7d32 100%);
+            border:none;border-radius:12px;color:white;font-size:1rem;font-weight:700;
+            font-family:'Inter',sans-serif;cursor:pointer;
+            transition:all 0.35s;box-shadow:0 8px 24px rgba(46,125,50,0.35);
+            position:relative;overflow:hidden;
+        }
+        .login-btn:hover:not(:disabled) { transform:translateY(-3px);box-shadow:0 14px 36px rgba(46,125,50,0.5); }
+        .login-btn:disabled { opacity:0.5;cursor:not-allowed; }
+        .login-btn .btn-loading { display:none; }
+        .login-btn.loading .btn-text { visibility:hidden; }
+        .login-btn.loading .btn-loading { display:block;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%); }
+        .spinner { width:22px;height:22px;border:3px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite; }
+
+        .auth-msg { margin-top:14px;padding:12px;border-radius:10px;text-align:center;font-size:0.88rem;font-weight:500;display:none; }
+        .auth-msg.success { background:rgba(129,199,132,0.15);color:#81c784;border:1px solid rgba(129,199,132,0.3); }
+        .auth-msg.error { background:rgba(255,71,87,0.15);color:#ff4757;border:1px solid rgba(255,71,87,0.3); }
+
+        .register-prompt { text-align:center;margin-top:18px;font-size:0.88rem;color:rgba(255,255,255,0.7); }
+        .register-prompt a { color:#81c784;text-decoration:none;font-weight:600;margin-left:4px; }
+        .register-prompt a:hover { color:#a5d6a7; }
+
+        @media (max-width: 768px) {
+            .login-container { grid-template-columns: 1fr; }
+            .login-branding { display: none; }
+            .login-form-wrapper { padding: 36px 28px; }
+        }
+    </style>
+</head>
+<body>
+    <div style="position:fixed;top:40%;left:50%;width:350px;height:350px;background:radial-gradient(circle,rgba(129,199,132,0.4) 0%,transparent 70%);border-radius:50%;animation:blob1 25s ease-in-out infinite reverse;z-index:0;"></div>
+
+    <div class="login-wrapper">
+        <div class="login-container">
+            <!-- Branding -->
+            <div class="login-branding">
+                <div class="brand-header">
+                    <span class="logo-icon">🧹🌿</span>
+                    <span class="logo-text">CLEANIFY</span>
+                </div>
+                <div class="brand-content">
+                    <h1>Welcome to Clean City</h1>
+                    <p>Sign in to your account and continue making a difference in your community.</p>
+                    <ul class="features-list">
+                        <li><span class="feature-icon">📍</span>Report issues instantly</li>
+                        <li><span class="feature-icon">🤖</span>AI-powered waste classification</li>
+                        <li><span class="feature-icon">🏆</span>Earn green points & rewards</li>
+                        <li><span class="feature-icon">📊</span>Track real-time progress</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <div class="login-form-wrapper">
+                <div class="form-header">
+                    <h2>Sign In</h2>
+                    <p>Enter your credentials to continue</p>
+                </div>
+
+                <form id="loginForm" onsubmit="handleLogin(event)" novalidate>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">✉️</span>
+                            <input type="email" id="email" placeholder="you@example.com" required autocomplete="email">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔒</span>
+                            <input type="password" id="password" placeholder="Your password" required autocomplete="current-password">
+                            <button type="button" class="toggle-password" onclick="toggleVis('password', this)">👁️</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="login-btn" id="loginBtn">
+                        <span class="btn-text">🌿 Sign In</span>
+                        <span class="btn-loading"><div class="spinner"></div></span>
+                    </button>
+                </form>
+
+                <div id="authMsg" class="auth-msg"></div>
+
+                <p class="register-prompt">
+                    Don't have an account? <a href="./reg.html">Create one</a>
+                </p>
+
+                <div style="margin-top:20px;padding:14px;background:rgba(255,255,255,0.05);border-radius:10px;font-size:12px;color:rgba(255,255,255,0.5);text-align:center;">
+                    <strong style="color:rgba(255,255,255,0.7);">Demo Accounts:</strong><br>
+                    Admin: admin@cleanify.com / admin123<br>
+                    Register as a citizen to create your own account
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = '';
+
+        // If already logged in, redirect
+        const token = localStorage.getItem('cleanify_token');
+        const role = localStorage.getItem('cleanify_role');
+        if (token) {
+            if (role === 'admin') window.location.href = './admin.html';
+            else window.location.href = './user.html';
+        }
+
+        function toggleVis(inputId, btn) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+            btn.textContent = input.type === 'password' ? '👁️' : '🙈';
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const msgEl = document.getElementById('authMsg');
+
+            if (!email || !password) {
+                showMsg('Please enter email and password.', 'error');
+                return;
+            }
+
+            btn.classList.add('loading');
+            btn.disabled = true;
+            msgEl.style.display = 'none';
+
+            try {
+                const res = await fetch(`${API}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Login failed');
+
+                localStorage.setItem('cleanify_token', data.token);
+                localStorage.setItem('cleanify_role', data.role);
+                localStorage.setItem('cleanify_name', data.fullname);
+
+                showMsg(`✅ Welcome back, ${data.fullname}! Redirecting...`, 'success');
+                setTimeout(() => {
+                    if (data.role === 'admin') window.location.href = './admin.html';
+                    else window.location.href = './user.html';
+                }, 1000);
+
+            } catch (err) {
+                showMsg(err.message, 'error');
+            } finally {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+
+        function showMsg(msg, type) {
+            const el = document.getElementById('authMsg');
+            el.textContent = msg;
+            el.className = `auth-msg ${type}`;
+            el.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

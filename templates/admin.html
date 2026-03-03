@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CLEANIFY</title>
+    <meta name="description"
+        content="CLEANIFY Admin Dashboard - Manage and review citizen complaints about waste dumping, unclean washrooms, and other cleanliness issues.">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🌿 CLEANIFY</h2>
+            <span class="admin-badge">Admin Panel</span>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="#" class="active" onclick="switchSection('dashboard', this); return false;"><span
+                        class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+            <li><a href="#" onclick="switchSection('all-complaints', this); return false;"><span
+                        class="nav-icon">📋</span> <span>All Complaints</span></a></li>
+            <li><a href="#" onclick="switchSection('washroom-reports', this); return false;"><span
+                        class="nav-icon">🚿</span> <span>Washroom Reports</span></a></li>
+            <li><a href="#" onclick="switchSection('issue-reports', this); return false;"><span
+                        class="nav-icon">🚛</span> <span>Issue Reports</span></a></li>
+            <li><a href="#" onclick="switchSection('rewards', this); return false;"><span class="nav-icon">🏆</span>
+                    <span>Rewards</span></a></li>
+            <li><a href="#" onclick="switchSection('live-tracking', this); return false;"><span
+                        class="nav-icon">📡</span> <span>Live Tracking</span></a></li>
+            <li><a href="#" onclick="switchSection('analytics', this); return false;"><span class="nav-icon">📈</span>
+                    <span>Analytics</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="admin-profile">
+                <div class="admin-avatar" id="adminAvatar">A</div>
+                <div class="admin-info">
+                    <div class="name" id="adminName">Loading...</div>
+                    <div class="role" id="adminRole">Admin</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOP BAR -->
+        <div class="top-bar">
+            <h1><span class="live-dot"></span> Admin <span>Dashboard</span></h1>
+            <div class="top-bar-actions">
+                <button class="refresh-btn" onclick="loadComplaints()">🔄 Refresh</button>
+                <button class="clear-btn" onclick="clearAllComplaints()">🗑️ Clear All</button>
+            </div>
+        </div>
+
+        <!-- SECTION: DASHBOARD -->
+        <div class="page-section active" id="section-dashboard">
+            <!-- STATS -->
+            <div class="stats-grid">
+                <div class="stat-card total">
+                    <div class="stat-header">
+                        <div class="stat-icon">📋</div>
+                        <span class="stat-trend" id="trendTotal">—</span>
+                    </div>
+                    <div class="stat-value" id="statTotal">0</div>
+                    <div class="stat-label">Total Complaints</div>
+                </div>
+                <div class="stat-card pending">
+                    <div class="stat-header">
+                        <div class="stat-icon">⏳</div>
+                        <span class="stat-trend" id="trendPending">—</span>
+                    </div>
+                    <div class="stat-value" id="statPending">0</div>
+                    <div class="stat-label">Pending Review</div>
+                </div>
+                <div class="stat-card resolved">
+                    <div class="stat-header">
+                        <div class="stat-icon">✅</div>
+                        <span class="stat-trend" id="trendResolved">—</span>
+                    </div>
+                    <div class="stat-value" id="statResolved">0</div>
+                    <div class="stat-label">Resolved</div>
+                </div>
+                <div class="stat-card washroom">
+                    <div class="stat-header">
+                        <div class="stat-icon">🚿</div>
+                        <span class="stat-trend" id="trendWashroom">—</span>
+                    </div>
+                    <div class="stat-value" id="statWashroom">0</div>
+                    <div class="stat-label">Washroom Reports</div>
+                </div>
+                <div class="stat-card rewards-stat">
+                    <div class="stat-header">
+                        <div class="stat-icon">🏆</div>
+                        <span class="stat-trend" id="trendRewards">—</span>
+                    </div>
+                    <div class="stat-value" id="statRewards">0</div>
+                    <div class="stat-label">Rewards Given</div>
+                </div>
+            </div>
+
+            <!-- FILTER BAR -->
+            <div class="filter-bar">
+                <button class="filter-btn active" onclick="filterComplaints('all', this)">All</button>
+                <button class="filter-btn" onclick="filterComplaints('report', this)">🚛 Dumping / Issues</button>
+                <button class="filter-btn" onclick="filterComplaints('washroom', this)">🚿 Washroom</button>
+                <button class="filter-btn" onclick="filterComplaints('pending', this)">⏳ Pending</button>
+                <button class="filter-btn" onclick="filterComplaints('resolved', this)">✅ Resolved</button>
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search complaints..." oninput="searchComplaints()">
+                </div>
+            </div>
+
+            <!-- COMPLAINTS TABLE -->
+            <div class="complaints-section">
+                <div class="complaints-header">
+                    <h2>📋 Complaint Records <span class="complaints-count" id="visibleCount">0</span></h2>
+                </div>
+                <table class="complaints-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Reporter</th>
+                            <th>Location</th>
+                            <th>Description</th>
+                            <th>Image</th>
+                            <th>Date & Time</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="complaintsBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+                <div class="empty-state" id="emptyState" style="display:none;">
+                    <div class="empty-icon">📭</div>
+                    <h3>No complaints yet</h3>
+                    <p>When users submit complaints on the User Page, they will appear here in real-time.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: ALL COMPLAINTS -->
+        <div class="page-section" id="section-all-complaints">
+            <div class="section-title">
+                <h2>📋 All Complaints</h2>
+                <p>Complete list of all submitted complaints</p>
+            </div>
+            <div class="complaints-section">
+                <table class="complaints-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Reporter</th>
+                            <th>Location</th>
+                            <th>Description</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="allComplaintsBody"></tbody>
+                </table>
+                <div class="empty-state" id="allEmptyState" style="display:none;">
+                    <div class="empty-icon">📭</div>
+                    <h3>No complaints</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: WASHROOM REPORTS -->
+        <div class="page-section" id="section-washroom-reports">
+            <div class="section-title">
+                <h2>🚿 Washroom Reports</h2>
+                <p>Complaints specifically about unclean washrooms</p>
+            </div>
+            <div class="complaints-section">
+                <table class="complaints-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Reporter</th>
+                            <th>Location</th>
+                            <th>Description</th>
+                            <th>Image</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="washroomBody"></tbody>
+                </table>
+                <div class="empty-state" id="washroomEmptyState" style="display:none;">
+                    <div class="empty-icon">🚿</div>
+                    <h3>No washroom reports</h3>
+                    <p>No unclean washroom complaints have been submitted yet.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: ISSUE REPORTS -->
+        <div class="page-section" id="section-issue-reports">
+            <div class="section-title">
+                <h2>🚛 Issue Reports</h2>
+                <p>Reported issues like dumping, overflowing bins, blocked drains etc.</p>
+            </div>
+            <div class="complaints-section">
+                <table class="complaints-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Reporter</th>
+                            <th>Issue Type</th>
+                            <th>Location</th>
+                            <th>Description</th>
+                            <th>Image</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="issueBody"></tbody>
+                </table>
+                <div class="empty-state" id="issueEmptyState" style="display:none;">
+                    <div class="empty-icon">🚛</div>
+                    <h3>No issue reports</h3>
+                    <p>No issues have been reported yet.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: REWARDS -->
+        <div class="page-section" id="section-rewards">
+            <div class="section-title">
+                <h2>🏆 Rewards</h2>
+                <p>Citizens rewarded for keeping the city clean</p>
+            </div>
+            <div class="rewards-stats-grid">
+                <div class="reward-stat-card">
+                    <div class="reward-stat-icon">🏆</div>
+                    <div class="reward-stat-value" id="rewardTotalCount">0</div>
+                    <div class="reward-stat-label">Total Rewards</div>
+                </div>
+                <div class="reward-stat-card">
+                    <div class="reward-stat-icon">⭐</div>
+                    <div class="reward-stat-value" id="rewardTotalPoints">0</div>
+                    <div class="reward-stat-label">Points Awarded</div>
+                </div>
+                <div class="reward-stat-card">
+                    <div class="reward-stat-icon">👤</div>
+                    <div class="reward-stat-value" id="rewardUniqueUsers">0</div>
+                    <div class="reward-stat-label">Unique Recipients</div>
+                </div>
+            </div>
+            <!-- Add Reward Form -->
+            <div class="reward-form-card">
+                <h3>➕ Award New Reward</h3>
+                <div class="reward-form">
+                    <input type="text" id="rewardName" placeholder="Recipient Name" class="reward-input">
+                    <select id="rewardType" class="reward-input">
+                        <option value="Clean Hero">🦸 Clean Hero</option>
+                        <option value="Eco Warrior">🌿 Eco Warrior</option>
+                        <option value="Star Reporter">⭐ Star Reporter</option>
+                        <option value="Community Champion">🏅 Community Champion</option>
+                    </select>
+                    <input type="number" id="rewardPoints" placeholder="Points" class="reward-input" min="1"
+                        value="100">
+                    <input type="text" id="rewardReason" placeholder="Reason for reward" class="reward-input">
+                    <button class="reward-submit-btn" onclick="addReward()">🏆 Award Reward</button>
+                </div>
+            </div>
+            <!-- Rewards Table -->
+            <div class="complaints-section">
+                <div class="complaints-header">
+                    <h2>🏆 Reward Recipients <span class="complaints-count" id="rewardCount">0</span></h2>
+                </div>
+                <table class="complaints-table">
+                    <thead>
+                        <tr>
+                            <th>Recipient</th>
+                            <th>Reward Type</th>
+                            <th>Points</th>
+                            <th>Reason</th>
+                            <th>Date Awarded</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rewardsBody"></tbody>
+                </table>
+                <div class="empty-state" id="rewardsEmptyState" style="display:none;">
+                    <div class="empty-icon">🏆</div>
+                    <h3>No rewards yet</h3>
+                    <p>Start rewarding citizens for their contributions to cleanliness!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: LIVE TRACKING -->
+        <div class="page-section" id="section-live-tracking">
+            <div class="section-title">
+                <h2><span class="live-badge">● LIVE</span> Facility Tracking & Availability</h2>
+                <p>Real-time status of washrooms and public facilities</p>
+            </div>
+            <div class="facility-grid" id="facilityGrid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- SECTION: ANALYTICS -->
+        <div class="page-section" id="section-analytics">
+            <div class="section-title">
+                <h2>📈 Analytics Overview</h2>
+                <p>Visual breakdown of complaint trends — all data pulled live from the database</p>
+            </div>
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <h3>Complaint Types Distribution</h3>
+                    <div id="typeChart" class="chart-container"></div>
+                </div>
+                <div class="analytics-card">
+                    <h3>Status Breakdown</h3>
+                    <div id="statusChart" class="chart-container"></div>
+                </div>
+                <div class="analytics-card full-width">
+                    <h3>Activity Timeline (Last 14 Days)</h3>
+                    <div id="timelineContainer" class="timeline-container"></div>
+                </div>
+                <div class="analytics-card full-width">
+                    <h3>🏆 Top Reported Locations</h3>
+                    <div id="topLocationsContainer"></div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="admin-footer">
+            <p>© 2026 <span>CLEANIFY</span> Admin Panel | Built for a Clean India 🇮🇳</p>
+        </footer>
+    </main>
+
+    <!-- IMAGE MODAL -->
+    <div class="image-modal-overlay" id="imageModal" onclick="closeImageModal()">
+        <div class="image-modal" onclick="event.stopPropagation()">
+            <button class="image-modal-close" onclick="closeImageModal()">✕</button>
+            <img id="modalImage" src="" alt="Complaint Photo">
+        </div>
+    </div>
+
+    <!-- DETAIL MODAL -->
+    <div class="detail-modal-overlay" id="detailModal" onclick="closeDetailModal()">
+        <div class="detail-modal" onclick="event.stopPropagation()">
+            <button class="detail-modal-close" onclick="closeDetailModal()">✕</button>
+            <h2>📋 Complaint Details</h2>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+        <script>
+        const API = '';
+        function getToken() { return localStorage.getItem('cleanify_token'); }
+        
+        // Auth check
+        if (!getToken() || localStorage.getItem('cleanify_role') !== 'admin') {
+            window.location.href = './index.html';
+        }
+
+        function logout() {
+            fetch(API+'/api/auth/logout',{method:'POST',headers:{'Authorization':'Bearer '+getToken()}});
+            localStorage.clear();
+            window.location.href = './index.html';
+        }
+
+        let allComplaints = [];
+        let currentFilter = 'all';
+
+        async function loadComplaints() {
+            try {
+                const [complaintsRes, statsRes, rewardsRes] = await Promise.all([
+                    fetch(API+'/api/complaints', {headers:{'Authorization':'Bearer '+getToken()}}),
+                    fetch(API+'/api/stats', {headers:{'Authorization':'Bearer '+getToken()}}),
+                    fetch(API+'/api/rewards', {headers:{'Authorization':'Bearer '+getToken()}})
+                ]);
+
+                if (complaintsRes.status === 401) { window.location.href = './index.html'; return; }
+
+                allComplaints = await complaintsRes.json();
+                const stats = await statsRes.json();
+                const rewards = await rewardsRes.json();
+
+                allComplaints.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                updateStats(stats);
+                renderComplaints(allComplaints);
+                renderAllSections(allComplaints, rewards);
+                showToast('✅ Dashboard refreshed', 'success');
+            } catch(err) {
+                showToast('❌ Failed to load data', 'error');
+            }
+        }
+
+        function updateStats(stats) {
+            animateNumber('statTotal', stats.total);
+            animateNumber('statPending', stats.pending);
+            animateNumber('statResolved', stats.resolved);
+            animateNumber('statWashroom', stats.washroom);
+            animateNumber('statRewards', stats.rewards);
+            document.getElementById('trendTotal').textContent = stats.total > 0 ? `${stats.total} total` : '—';
+            document.getElementById('trendPending').textContent = stats.pending > 0 ? `${stats.pending} active` : '—';
+            document.getElementById('trendResolved').textContent = stats.resolved > 0 ? `${stats.resolved} done` : '—';
+            document.getElementById('trendWashroom').textContent = stats.washroom > 0 ? `${stats.washroom} reports` : '—';
+            document.getElementById('trendRewards').textContent = stats.rewards > 0 ? `${stats.rewards} given` : '—';
+        }
+
+        function animateNumber(elementId, target) {
+            const el = document.getElementById(elementId);
+            const current = parseInt(el.textContent) || 0;
+            if (current === target) return;
+            const duration = 500;
+            const step = (target - current) / (duration / 16);
+            let value = current;
+            function update() {
+                value += step;
+                if ((step > 0 && value >= target) || (step < 0 && value <= target)) { el.textContent = target; return; }
+                el.textContent = Math.round(value);
+                requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        function renderComplaints(complaints) {
+            const tbody = document.getElementById('complaintsBody');
+            const emptyState = document.getElementById('emptyState');
+            if (complaints.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                document.getElementById('visibleCount').textContent = '0';
+                return;
+            }
+            emptyState.style.display = 'none';
+            document.getElementById('visibleCount').textContent = complaints.length;
+            tbody.innerHTML = complaints.map((c, idx) => `
+                <tr style="animation: cardIn 0.3s ease-out ${idx * 0.05}s backwards;">
+                    <td><span class="complaint-id">${c.id}</span></td>
+                    <td><span class="complaint-type-badge ${c.issueType || 'dumping'}">${getTypeIcon(c.issueType)} ${getTypeName(c.issueType)}</span></td>
+                    <td>${escapeHtml(c.reporter || 'Anonymous')}</td>
+                    <td><span class="complaint-location">📍 ${escapeHtml(c.location || 'N/A')}</span></td>
+                    <td><span class="complaint-desc" title="${escapeHtml(c.description || '')}">${escapeHtml((c.description||'No description').substring(0,60))}${(c.description||'').length>60?'...':''}</span></td>
+                    <td>${c.image ? `<img class="complaint-image-thumb" src="${c.image}" onclick="openImageModal('${c.image}')" alt="Evidence">` : '<div class="no-image">N/A</div>'}</td>
+                    <td><span class="complaint-time">${formatTime(c.timestamp)}</span></td>
+                    <td><span class="status-badge ${c.status.toLowerCase().replace(' ','-')}" onclick="cycleStatus('${c.id}')">${getStatusIcon(c.status)} ${c.status}</span></td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn" onclick="viewDetails('${c.id}')" title="View Details">👁️</button>
+                            <button class="action-btn delete" onclick="deleteComplaint('${c.id}')" title="Delete">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderAllSections(complaints, rewards) {
+            // All complaints
+            const allBody = document.getElementById('allComplaintsBody');
+            allBody.innerHTML = complaints.map(c => `
+                <tr>
+                    <td><span class="complaint-id">${c.id}</span></td>
+                    <td><span class="complaint-type-badge ${c.issueType}">${getTypeIcon(c.issueType)} ${getTypeName(c.issueType)}</span></td>
+                    <td>${escapeHtml(c.reporter||'Anonymous')}</td>
+                    <td>📍 ${escapeHtml(c.location||'')}</td>
+                    <td>${escapeHtml((c.description||'').substring(0,50))}...</td>
+                    <td>${formatTime(c.timestamp)}</td>
+                    <td><span class="status-badge ${c.status.toLowerCase().replace(' ','-')}">${getStatusIcon(c.status)} ${c.status}</span></td>
+                    <td><div class="action-btns"><button class="action-btn" onclick="viewDetails('${c.id}')">👁️</button><button class="action-btn delete" onclick="deleteComplaint('${c.id}')">🗑️</button></div></td>
+                </tr>
+            `).join('');
+            document.getElementById('allEmptyState').style.display = complaints.length ? 'none' : 'block';
+
+            // Washroom
+            const washroomComplaints = complaints.filter(c => c.type === 'washroom' || c.issueType === 'washroom');
+            const wBody = document.getElementById('washroomBody');
+            wBody.innerHTML = washroomComplaints.map(c => `
+                <tr>
+                    <td><span class="complaint-id">${c.id}</span></td>
+                    <td>${escapeHtml(c.reporter||'Anonymous')}</td>
+                    <td>📍 ${escapeHtml(c.location||'')}</td>
+                    <td>${escapeHtml((c.description||'').substring(0,50))}</td>
+                    <td>${c.image ? `<img class="complaint-image-thumb" src="${c.image}" onclick="openImageModal('${c.image}')" alt="Evidence">` : 'N/A'}</td>
+                    <td>${formatTime(c.timestamp)}</td>
+                    <td><span class="status-badge ${c.status.toLowerCase().replace(' ','-')}">${getStatusIcon(c.status)} ${c.status}</span></td>
+                    <td><div class="action-btns"><button class="action-btn" onclick="viewDetails('${c.id}')">👁️</button><button class="action-btn delete" onclick="deleteComplaint('${c.id}')">🗑️</button></div></td>
+                </tr>
+            `).join('');
+            document.getElementById('washroomEmptyState').style.display = washroomComplaints.length ? 'none' : 'block';
+
+            // Issues
+            const issueComplaints = complaints.filter(c => c.type === 'report');
+            const iBody = document.getElementById('issueBody');
+            iBody.innerHTML = issueComplaints.map(c => `
+                <tr>
+                    <td><span class="complaint-id">${c.id}</span></td>
+                    <td>${escapeHtml(c.reporter||'Anonymous')}</td>
+                    <td><span class="complaint-type-badge ${c.issueType}">${getTypeIcon(c.issueType)} ${getTypeName(c.issueType)}</span></td>
+                    <td>📍 ${escapeHtml(c.location||'')}</td>
+                    <td>${escapeHtml((c.description||'').substring(0,50))}</td>
+                    <td>${c.image ? `<img class="complaint-image-thumb" src="${c.image}" onclick="openImageModal('${c.image}')" alt="Evidence">` : 'N/A'}</td>
+                    <td>${formatTime(c.timestamp)}</td>
+                    <td><span class="status-badge ${c.status.toLowerCase().replace(' ','-')}">${getStatusIcon(c.status)} ${c.status}</span></td>
+                    <td><div class="action-btns"><button class="action-btn" onclick="viewDetails('${c.id}')">👁️</button><button class="action-btn delete" onclick="deleteComplaint('${c.id}')">🗑️</button></div></td>
+                </tr>
+            `).join('');
+            document.getElementById('issueEmptyState').style.display = issueComplaints.length ? 'none' : 'block';
+
+            // Rewards
+            renderRewards(rewards);
+        }
+
+        function renderRewards(rewards) {
+            const tbody = document.getElementById('rewardsBody');
+            const totalPoints = rewards.reduce((s,r) => s + (r.points||0), 0);
+            const uniqueUsers = [...new Set(rewards.map(r => r.recipient))].length;
+            animateNumber('rewardTotalCount', rewards.length);
+            animateNumber('rewardTotalPoints', totalPoints);
+            animateNumber('rewardUniqueUsers', uniqueUsers);
+            document.getElementById('rewardCount').textContent = rewards.length;
+
+            if (!rewards.length) {
+                tbody.innerHTML = '';
+                document.getElementById('rewardsEmptyState').style.display = 'block';
+                return;
+            }
+            document.getElementById('rewardsEmptyState').style.display = 'none';
+            tbody.innerHTML = rewards.map(r => `
+                <tr>
+                    <td><strong>${escapeHtml(r.recipient)}</strong></td>
+                    <td>${r.reward_type}</td>
+                    <td><span style="color:#1a7f44;font-weight:600;">+${r.points} pts</span></td>
+                    <td>${escapeHtml(r.reason||'—')}</td>
+                    <td>${formatTime(r.awarded_at)}</td>
+                    <td><button class="action-btn delete" onclick="deleteReward(${r.id})">🗑️</button></td>
+                </tr>
+            `).join('');
+        }
+
+        // ── Helpers ──
+        function getTypeIcon(type) {
+            const icons = {'dumping':'🚛','washroom':'🚿','bin':'🗑️','drain':'🕳️','medical':'💊','industrial':'🏭','animal':'🐾'};
+            return icons[type] || '📋';
+        }
+        function getTypeName(type) {
+            const names = {'dumping':'Dumping','washroom':'Washroom','bin':'Overflowing Bin','drain':'Blocked Drain','medical':'Medical Waste','industrial':'Industrial','animal':'Dead Animal'};
+            return names[type] || type || 'General';
+        }
+        function getStatusIcon(status) {
+            return {'Pending':'⏳','In Progress':'🔄','Resolved':'✅','Rejected':'❌'}[status] || '⏳';
+        }
+        function formatTime(timestamp) {
+            if (!timestamp) return 'Unknown';
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHrs = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHrs < 24) return `${diffHrs}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
+        }
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ── Filter ──
+        function filterComplaints(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            applyFilters();
+        }
+        function searchComplaints() { applyFilters(); }
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = [...allComplaints];
+            if (currentFilter === 'report') filtered = filtered.filter(c => c.type === 'report');
+            else if (currentFilter === 'washroom') filtered = filtered.filter(c => c.type === 'washroom');
+            else if (currentFilter === 'pending') filtered = filtered.filter(c => c.status === 'Pending');
+            else if (currentFilter === 'resolved') filtered = filtered.filter(c => c.status === 'Resolved');
+            if (searchTerm) {
+                filtered = filtered.filter(c =>
+                    (c.id||'').toLowerCase().includes(searchTerm) ||
+                    (c.location||'').toLowerCase().includes(searchTerm) ||
+                    (c.description||'').toLowerCase().includes(searchTerm) ||
+                    (c.issueType||'').toLowerCase().includes(searchTerm)
+                );
+            }
+            renderComplaints(filtered);
+        }
+
+        // ── Status cycle ──
+        async function cycleStatus(id) {
+            const statuses = ['Pending','In Progress','Resolved','Rejected'];
+            const c = allComplaints.find(x => x.id === id);
+            if (!c) return;
+            const nextStatus = statuses[(statuses.indexOf(c.status) + 1) % statuses.length];
+            try {
+                const res = await fetch(`${API}/api/complaints/${id}/status`, {
+                    method: 'PATCH',
+                    headers: {'Content-Type':'application/json','Authorization':'Bearer '+getToken()},
+                    body: JSON.stringify({status: nextStatus})
+                });
+                if (!res.ok) throw new Error();
+                showToast(`✅ Status updated to "${nextStatus}"`, 'success');
+                loadComplaints();
+            } catch { showToast('❌ Failed to update status', 'error'); }
+        }
+
+        // ── View details ──
+        function viewDetails(id) {
+            const c = allComplaints.find(x => x.id === id);
+            if (!c) return;
+            const content = `
+                <div class="detail-row"><span class="detail-label">Complaint ID</span><span class="detail-value" style="color:var(--accent);font-family:monospace;font-weight:600;">${c.id}</span></div>
+                <div class="detail-row"><span class="detail-label">Reporter</span><span class="detail-value">${escapeHtml(c.reporter||'Anonymous')}</span></div>
+                <div class="detail-row"><span class="detail-label">Type</span><span class="detail-value"><span class="complaint-type-badge ${c.issueType}">${getTypeIcon(c.issueType)} ${getTypeName(c.issueType)}</span></span></div>
+                ${c.severity ? `<div class="detail-row"><span class="detail-label">Severity</span><span class="detail-value" style="text-transform:capitalize;">${c.severity==='high'?'🔴':c.severity==='medium'?'🟡':'🟢'} ${c.severity}</span></div>` : ''}
+                <div class="detail-row"><span class="detail-label">Location</span><span class="detail-value">📍 ${escapeHtml(c.location||'Not provided')}</span></div>
+                <div class="detail-row"><span class="detail-label">Description</span><span class="detail-value">${escapeHtml(c.description||'No description')}</span></div>
+                <div class="detail-row"><span class="detail-label">Submitted</span><span class="detail-value">${new Date(c.timestamp).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})}</span></div>
+                <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">
+                    <select class="detail-status-select" onchange="updateStatusFromDetail('${c.id}', this.value)">
+                        <option value="Pending" ${c.status==='Pending'?'selected':''}>⏳ Pending</option>
+                        <option value="In Progress" ${c.status==='In Progress'?'selected':''}>🔄 In Progress</option>
+                        <option value="Resolved" ${c.status==='Resolved'?'selected':''}>✅ Resolved</option>
+                        <option value="Rejected" ${c.status==='Rejected'?'selected':''}>❌ Rejected</option>
+                    </select>
+                </span></div>
+                ${c.image ? `<div class="detail-row"><span class="detail-label">Evidence</span><span class="detail-value"><img class="detail-image" src="${c.image}" alt="Evidence Photo"></span></div>` : ''}
+            `;
+            document.getElementById('detailContent').innerHTML = content;
+            document.getElementById('detailModal').classList.add('visible');
+        }
+
+        async function updateStatusFromDetail(id, newStatus) {
+            try {
+                const res = await fetch(`${API}/api/complaints/${id}/status`, {
+                    method: 'PATCH',
+                    headers: {'Content-Type':'application/json','Authorization':'Bearer '+getToken()},
+                    body: JSON.stringify({status: newStatus})
+                });
+                if (!res.ok) throw new Error();
+                showToast(`✅ Status updated to "${newStatus}"`, 'success');
+                loadComplaints();
+            } catch { showToast('❌ Failed to update status', 'error'); }
+        }
+
+        function closeDetailModal() { document.getElementById('detailModal').classList.remove('visible'); }
+        function openImageModal(src) { document.getElementById('modalImage').src=src; document.getElementById('imageModal').classList.add('visible'); }
+        function closeImageModal() { document.getElementById('imageModal').classList.remove('visible'); }
+
+        // ── Delete ──
+        async function deleteComplaint(id) {
+            if (!confirm('Delete this complaint?')) return;
+            try {
+                const res = await fetch(`${API}/api/complaints/${id}`, {
+                    method: 'DELETE',
+                    headers: {'Authorization':'Bearer '+getToken()}
+                });
+                if (!res.ok) throw new Error();
+                showToast('🗑️ Complaint deleted', 'error');
+                loadComplaints();
+            } catch { showToast('❌ Delete failed', 'error'); }
+        }
+
+        async function clearAllComplaints() {
+            if (!confirm('⚠️ Clear ALL complaints? This cannot be undone.')) return;
+            try {
+                const res = await fetch(`${API}/api/complaints/clear`, {
+                    method: 'DELETE',
+                    headers: {'Authorization':'Bearer '+getToken()}
+                });
+                if (!res.ok) throw new Error();
+                showToast('🗑️ All complaints cleared', 'error');
+                loadComplaints();
+            } catch { showToast('❌ Clear failed', 'error'); }
+        }
+
+        // ── Rewards ──
+        async function addReward() {
+            const recipient = document.getElementById('rewardName').value.trim();
+            const rewardType = document.getElementById('rewardType').value;
+            const points = document.getElementById('rewardPoints').value;
+            const reason = document.getElementById('rewardReason').value.trim();
+            if (!recipient) { showToast('Please enter recipient name', 'error'); return; }
+            try {
+                const res = await fetch(`${API}/api/rewards`, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json','Authorization':'Bearer '+getToken()},
+                    body: JSON.stringify({recipient, rewardType, points: parseInt(points), reason})
+                });
+                if (!res.ok) throw new Error();
+                showToast('🏆 Reward added!', 'success');
+                document.getElementById('rewardName').value = '';
+                document.getElementById('rewardReason').value = '';
+                loadComplaints();
+            } catch { showToast('❌ Failed to add reward', 'error'); }
+        }
+
+        async function deleteReward(id) {
+            if (!confirm('Delete this reward?')) return;
+            try {
+                const res = await fetch(`${API}/api/rewards/${id}`, {
+                    method: 'DELETE',
+                    headers: {'Authorization':'Bearer '+getToken()}
+                });
+                if (!res.ok) throw new Error();
+                showToast('🗑️ Reward deleted', 'error');
+                loadComplaints();
+            } catch { showToast('❌ Delete failed', 'error'); }
+        }
+
+        // ── Toast ──
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} visible`;
+            setTimeout(() => toast.classList.remove('visible'), 2500);
+        }
+
+        // ── Section Switching ──
+        function switchSection(sectionId, clickedLink) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+            document.getElementById(`section-${sectionId}`).classList.add('active');
+            if (clickedLink) clickedLink.classList.add('active');
+        }
+
+        // ── Facility Tracking (dynamic from washroom complaints) ──
+        async function loadFacilities() {
+            try {
+                const res = await fetch(`${API}/api/analytics`, {headers:{'Authorization':'Bearer '+getToken()}});
+                const data = await res.json();
+                // Build facility cards from washroom complaints in allComplaints
+                const washroomComplaints = allComplaints.filter(c => c.type === 'washroom' || c.issueType === 'washroom');
+                const grid = document.getElementById('facilityGrid');
+                if (!washroomComplaints.length) {
+                    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;background:white;border-radius:12px;color:#999;">No washroom complaints yet. Facility status will appear here as citizens report issues.</div>`;
+                    return;
+                }
+                // Deduplicate by location
+                const seen = new Set();
+                const facilities = [];
+                for (const c of washroomComplaints) {
+                    if (!c.location || seen.has(c.location)) continue;
+                    seen.add(c.location);
+                    let icon, status, color;
+                    if (c.status === 'Resolved') { icon='🟢'; status='Clean'; color='#27ae60'; }
+                    else if (c.severity === 'high' || c.status === 'Pending') { icon='🔴'; status='Needs Urgent Attention'; color='#e74c3c'; }
+                    else { icon='🟡'; status='Needs Attention'; color='#f39c12'; }
+                    facilities.push({name: c.location, status, icon, color, time: formatTime(c.timestamp), reporter: c.reporter, cid: c.id});
+                }
+                grid.innerHTML = facilities.map(f => `
+                    <div style="background:white;border-radius:12px;padding:20px;box-shadow:0 4px 15px rgba(0,0,0,0.08);border-left:4px solid ${f.color};">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                            <strong style="font-size:14px;">${escapeHtml(f.name)}</strong>
+                            <span style="font-size:18px;">${f.icon}</span>
+                        </div>
+                        <p style="font-size:13px;color:#555;margin:0;">Status: <strong style="color:${f.color};">${f.status}</strong></p>
+                        <p style="font-size:12px;color:#999;margin:5px 0 0;">Reported by ${escapeHtml(f.reporter||'Anonymous')} · ${f.time}</p>
+                        <button onclick="viewDetails('${f.cid}')" style="margin-top:12px;width:100%;padding:7px;background:rgba(26,127,68,0.08);border:1px solid rgba(26,127,68,0.2);border-radius:8px;color:#1a7f44;font-size:12px;cursor:pointer;font-weight:600;">👁️ View Complaint</button>
+                    </div>`).join('');
+            } catch(e) {
+                document.getElementById('facilityGrid').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;background:white;border-radius:12px;color:#999;">Unable to load facility data.</div>`;
+            }
+        }
+
+        // ── Analytics (fully dynamic from /api/analytics) ──
+        async function loadAnalytics() {
+            try {
+                const res = await fetch(`${API}/api/analytics`, {headers:{'Authorization':'Bearer '+getToken()}});
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                renderTypeChart(data.type_distribution);
+                renderStatusChart(data.status_breakdown);
+                renderTimeline(data.timeline);
+                renderTopLocations(data.top_locations);
+            } catch(e) {
+                ['typeChart','statusChart','timelineContainer'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerHTML = `<p style="color:#999;text-align:center;padding:20px;">No data available yet.</p>`;
+                });
+            }
+        }
+
+        function renderTypeChart(types) {
+            const el = document.getElementById('typeChart');
+            if (!types || !types.length) { el.innerHTML = `<p style="color:#999;text-align:center;padding:30px;">No data yet</p>`; return; }
+            const total = types.reduce((s,t) => s+t.count, 0);
+            const colors = ['#1a7f44','#2196F3','#e74c3c','#f39c12','#9C27B0','#FF9800','#00BCD4','#607D8B'];
+            const icons = {dumping:'🚛',washroom:'🚿',bin:'🗑️',drain:'🕳️',medical:'💊',industrial:'🏭',animal:'🐾',general:'📋'};
+            el.innerHTML = `
+                <div style="padding:10px 0;">
+                    ${types.map((t,i) => {
+                        const pct = Math.round((t.count/total)*100);
+                        return `
+                        <div style="margin-bottom:14px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+                                <span style="font-size:13px;font-weight:600;">${icons[t.label]||'📋'} ${t.label||'General'}</span>
+                                <span style="font-size:13px;color:${colors[i%colors.length]};font-weight:700;">${t.count} (${pct}%)</span>
+                            </div>
+                            <div style="height:10px;background:#f0f0f0;border-radius:5px;overflow:hidden;">
+                                <div style="height:100%;width:${pct}%;background:${colors[i%colors.length]};border-radius:5px;transition:width 0.8s ease;"></div>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>`;
+        }
+
+        function renderStatusChart(statuses) {
+            const el = document.getElementById('statusChart');
+            if (!statuses || !statuses.length) { el.innerHTML = `<p style="color:#999;text-align:center;padding:30px;">No data yet</p>`; return; }
+            const colorMap = {'Pending':'#f39c12','In Progress':'#3498db','Resolved':'#27ae60','Rejected':'#e74c3c'};
+            const iconMap = {'Pending':'⏳','In Progress':'🔄','Resolved':'✅','Rejected':'❌'};
+            const total = statuses.reduce((s,t) => s+t.count, 0);
+            el.innerHTML = `
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:10px 0;">
+                    ${statuses.map(s => `
+                        <div style="background:${colorMap[s.label]||'#999'}18;border:1.5px solid ${colorMap[s.label]||'#999'}44;border-radius:12px;padding:16px;text-align:center;">
+                            <div style="font-size:24px;">${iconMap[s.label]||'📋'}</div>
+                            <div style="font-size:22px;font-weight:800;color:${colorMap[s.label]||'#333'};margin:4px 0;">${s.count}</div>
+                            <div style="font-size:12px;color:#666;">${s.label}</div>
+                            <div style="font-size:11px;color:#999;">${Math.round((s.count/total)*100)}%</div>
+                        </div>`).join('')}
+                </div>`;
+        }
+
+        function renderTimeline(timeline) {
+            const el = document.getElementById('timelineContainer');
+            if (!timeline || !timeline.length) { el.innerHTML = `<p style="color:#999;text-align:center;padding:30px;">No activity in last 14 days</p>`; return; }
+            const max = Math.max(...timeline.map(t => t.count));
+            el.innerHTML = `
+                <div style="display:flex;align-items:flex-end;gap:8px;height:140px;padding:10px 0 0;">
+                    ${timeline.map(t => {
+                        const h = max > 0 ? Math.max(8, Math.round((t.count/max)*120)) : 8;
+                        const label = new Date(t.day).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+                        return `
+                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                            <span style="font-size:11px;font-weight:700;color:#1a7f44;">${t.count}</span>
+                            <div style="width:100%;height:${h}px;background:linear-gradient(to top,#1a7f44,#65a53b);border-radius:4px 4px 0 0;" title="${t.count} complaints on ${label}"></div>
+                            <span style="font-size:10px;color:#999;white-space:nowrap;">${label}</span>
+                        </div>`;
+                    }).join('')}
+                </div>`;
+        }
+
+        function renderTopLocations(locations) {
+            const existing = document.getElementById('topLocationsContainer');
+            if (!existing) return;
+            if (!locations || !locations.length) { existing.innerHTML = `<p style="color:#999;text-align:center;padding:20px;">No location data yet</p>`; return; }
+            existing.innerHTML = locations.map((l,i) => `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0f0f0;">
+                    <span style="font-size:13px;">🏆 #${i+1} · ${escapeHtml(l.location)}</span>
+                    <span style="background:#1a7f4418;color:#1a7f44;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">${l.count} reports</span>
+                </div>`).join('');
+        }
+
+        // ── Load admin profile ──
+        async function loadAdminProfile() {
+            try {
+                const res = await fetch(`${API}/api/auth/me`, {headers:{'Authorization':'Bearer '+getToken()}});
+                if (!res.ok) return;
+                const user = await res.json();
+                document.getElementById('adminName').textContent = user.fullname || 'Admin';
+                document.getElementById('adminRole').textContent = user.role === 'admin' ? 'Super Admin' : user.role;
+                document.getElementById('adminAvatar').textContent = (user.fullname||'A')[0].toUpperCase();
+            } catch(e) {}
+        }
+
+        // ── Keyboard ──
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') { closeImageModal(); closeDetailModal(); }
+        });
+
+        // ── Logout button ──
+        document.querySelector('.clear-btn')?.insertAdjacentHTML('afterend', 
+            '<button class="refresh-btn" style="background:#e74c3c;border-color:#e74c3c;" onclick="logout()">🚪 Logout</button>'
+        );
+
+        // ── Section switching — load analytics/facilities on demand ──
+        const _origSwitchSection = switchSection;
+        function switchSection(sectionId, clickedLink) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+            document.getElementById(`section-${sectionId}`).classList.add('active');
+            if (clickedLink) clickedLink.classList.add('active');
+            if (sectionId === 'analytics') loadAnalytics();
+            if (sectionId === 'live-tracking') loadFacilities();
+        }
+
+        // ── Auto refresh ──
+        setInterval(loadComplaints, 30000);
+
+        // ── Init ──
+        window.addEventListener('DOMContentLoaded', () => {
+            loadAdminProfile();
+            loadComplaints();
+        });
+    </script>
+</body>
+</html>

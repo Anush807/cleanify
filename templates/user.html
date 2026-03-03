@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLEANIFY - Home</title>
+    <link rel="stylesheet" href="../static/User.css">
+</head>
+<body>
+    <nav>
+        <h2>🌿 CLEANIFY</h2>
+        <ul>
+            <li><a href="./user.html">Home</a></li>
+            <li><a href="./report.html">Report Issue</a></li>
+            <li><a href="./ai.html">AI Classifier</a></li>
+            <li><a href="./eco.html">Eco Store</a></li>
+            <li><a href="./reward.html">Rewards</a></li>
+            <li>
+                <select id="languageSwitcher">
+                    <option value="en">🌐 English</option>
+                    <option value="hi">🇮🇳 हिंदी</option>
+                    <option value="kn">🇮🇳 ಕನ್ನಡ</option>
+                </select>
+            </li>
+            <li><button onclick="logout()" style="background:none;border:1px solid rgba(255,255,255,0.4);color:white;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;">🚪 Logout</button></li>
+        </ul>
+    </nav>
+
+    <div class="container" style="max-width:900px;">
+        <div style="text-align:center;margin-bottom:30px;">
+            <div style="font-size:80px;">🌿</div>
+            <h1 id="welcomeMsg" style="color:#1a7f44;font-size:2rem;margin:10px 0;">Welcome back!</h1>
+            <p style="color:#666;">Together we build a cleaner, greener city.</p>
+        </div>
+
+        <!-- Quick Stats -->
+        <div id="statsRow" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:30px;">
+            <div style="background:white;border-radius:14px;padding:20px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,0.08);">
+                <div style="font-size:30px;">🌟</div>
+                <div id="userPoints" style="font-size:1.8rem;font-weight:700;color:#1a7f44;">—</div>
+                <div style="font-size:13px;color:#666;">Green Points</div>
+            </div>
+            <div style="background:white;border-radius:14px;padding:20px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,0.08);">
+                <div style="font-size:30px;">📋</div>
+                <div id="userComplaints" style="font-size:1.8rem;font-weight:700;color:#1a7f44;">—</div>
+                <div style="font-size:13px;color:#666;">Reports Filed</div>
+            </div>
+            <div style="background:white;border-radius:14px;padding:20px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,0.08);">
+                <div style="font-size:30px;">✅</div>
+                <div id="userResolved" style="font-size:1.8rem;font-weight:700;color:#1a7f44;">—</div>
+                <div style="font-size:13px;color:#666;">Resolved</div>
+            </div>
+            <div style="background:white;border-radius:14px;padding:20px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,0.08);">
+                <div style="font-size:30px;">🏆</div>
+                <div id="userLevel" style="font-size:1.8rem;font-weight:700;color:#1a7f44;">—</div>
+                <div style="font-size:13px;color:#666;">Level</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <h3 style="color:#1a7f44;margin-bottom:15px;">⚡ Quick Actions</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:30px;">
+            <a href="./report.html" style="background:linear-gradient(135deg,#1a7f44,#65a53b);color:white;padding:20px;border-radius:14px;text-decoration:none;text-align:center;transition:transform 0.2s;">
+                <div style="font-size:30px;margin-bottom:8px;">📋</div>
+                <strong>Report an Issue</strong>
+                <p style="font-size:12px;opacity:0.85;margin-top:4px;">Dumping, bins, drains</p>
+            </a>
+            <a href="./ai.html" style="background:linear-gradient(135deg,#2196F3,#1565C0);color:white;padding:20px;border-radius:14px;text-decoration:none;text-align:center;transition:transform 0.2s;">
+                <div style="font-size:30px;margin-bottom:8px;">🤖</div>
+                <strong>AI Waste Classifier</strong>
+                <p style="font-size:12px;opacity:0.85;margin-top:4px;">Dry or Wet waste?</p>
+            </a>
+            <a href="./washroom.html" style="background:linear-gradient(135deg,#9C27B0,#6A1B9A);color:white;padding:20px;border-radius:14px;text-decoration:none;text-align:center;transition:transform 0.2s;">
+                <div style="font-size:30px;margin-bottom:8px;">🚿</div>
+                <strong>Washroom Report</strong>
+                <p style="font-size:12px;opacity:0.85;margin-top:4px;">Unclean washroom</p>
+            </a>
+            <a href="./eco.html" style="background:linear-gradient(135deg,#FF9800,#E65100);color:white;padding:20px;border-radius:14px;text-decoration:none;text-align:center;transition:transform 0.2s;">
+                <div style="font-size:30px;margin-bottom:8px;">🛒</div>
+                <strong>Eco Store</strong>
+                <p style="font-size:12px;opacity:0.85;margin-top:4px;">Sustainable products</p>
+            </a>
+        </div>
+
+        <!-- Recent Complaints -->
+        <h3 style="color:#1a7f44;margin-bottom:15px;">📋 My Recent Reports</h3>
+        <div id="recentComplaints" style="background:white;border-radius:14px;padding:20px;box-shadow:0 4px 15px rgba(0,0,0,0.08);">
+            <p style="color:#999;text-align:center;">Loading...</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Swachhta Platform | Built for a Clean India 🇮🇳</p>
+    </footer>
+
+    <script>
+        const API = '';
+        function getToken() { return localStorage.getItem('cleanify_token'); }
+        function logout() {
+            fetch(`${API}/api/auth/logout`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + getToken() } });
+            localStorage.clear();
+            window.location.href = './index.html';
+        }
+        if (!getToken()) { window.location.href = './index.html'; }
+
+        const icons = { dumping:'🚛', washroom:'🚿', bin:'🗑️', drain:'🕳️', medical:'💊', industrial:'🏭', animal:'🐾' };
+        const statusColors = { 'Pending': '#f39c12', 'In Progress': '#3498db', 'Resolved': '#27ae60', 'Rejected': '#e74c3c' };
+
+        async function loadData() {
+            try {
+                const [profileRes, complaintsRes] = await Promise.all([
+                    fetch(`${API}/api/profile`, { headers: { 'Authorization': 'Bearer ' + getToken() } }),
+                    fetch(`${API}/api/complaints`, { headers: { 'Authorization': 'Bearer ' + getToken() } })
+                ]);
+
+                if (profileRes.status === 401) { window.location.href = './index.html'; return; }
+
+                const profile = await profileRes.json();
+                const complaints = await complaintsRes.json();
+
+                document.getElementById('welcomeMsg').textContent = `Welcome back, ${profile.fullname}! 👋`;
+                document.getElementById('userPoints').textContent = profile.green_points;
+                document.getElementById('userComplaints').textContent = profile.total_complaints;
+                document.getElementById('userResolved').textContent = profile.resolved_complaints;
+                document.getElementById('userLevel').textContent = profile.level;
+
+                if (!complaints.length) {
+                    document.getElementById('recentComplaints').innerHTML = `
+                        <p style="text-align:center;color:#999;">No reports filed yet. <a href="./report.html" style="color:#1a7f44;">Report your first issue!</a></p>`;
+                    return;
+                }
+
+                const html = complaints.slice(0, 5).map(c => `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f0f0f0;">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span style="font-size:20px;">${icons[c.issueType] || '📋'}</span>
+                            <div>
+                                <strong style="font-size:14px;">${c.location || 'Unknown location'}</strong>
+                                <div style="font-size:12px;color:#999;">${c.description?.substring(0,50) || ''}${c.description?.length > 50 ? '...' : ''}</div>
+                                <div style="font-size:11px;color:#bbb;">${new Date(c.timestamp).toLocaleDateString('en-IN')}</div>
+                            </div>
+                        </div>
+                        <span style="padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;background:${statusColors[c.status]}22;color:${statusColors[c.status]};">${c.status}</span>
+                    </div>
+                `).join('');
+                document.getElementById('recentComplaints').innerHTML = html;
+
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>

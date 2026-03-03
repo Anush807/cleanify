@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Register for CLEANIFY - Join the movement for cleaner cities">
+    <title>Register - CLEANIFY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f2b1a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 30px 0;
+        }
+
+        /* Floating gradient blobs */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(76, 175, 80, 0.5) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: blob1 18s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -15%;
+            right: -10%;
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(0, 200, 120, 0.45) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: blob2 22s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes blob1 {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(80px, 60px) scale(1.15);
+            }
+
+            66% {
+                transform: translate(-40px, 100px) scale(0.9);
+            }
+        }
+
+        @keyframes blob2 {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(-70px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(50px, -80px) scale(0.95);
+            }
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20% {
+                transform: translateX(-6px);
+            }
+
+            40% {
+                transform: translateX(6px);
+            }
+
+            60% {
+                transform: translateX(-4px);
+            }
+
+            80% {
+                transform: translateX(4px);
+            }
+        }
+
+        .register-wrapper {
+            width: 100%;
+            max-width: 960px;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .register-container {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+
+        /* Left Side - Branding */
+        .register-branding {
+            background: linear-gradient(135deg, rgba(46, 125, 79, 0.45) 0%, rgba(27, 94, 54, 0.35) 100%);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 45px 38px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .brand-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .brand-header .logo-icon {
+            font-size: 2.5rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .brand-header .logo-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-content h1 {
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .brand-content p {
+            font-size: 0.93rem;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .features-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .features-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.92rem;
+            color: rgba(255, 255, 255, 0.9);
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .features-list li:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(4px);
+        }
+
+        .features-list li .feature-icon {
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        /* Right Side - Form */
+        .register-form-wrapper {
+            padding: 36px 38px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-header {
+            margin-bottom: 24px;
+        }
+
+        .form-header h2 {
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .form-header p {
+            font-size: 0.88rem;
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        /* Progress Steps */
+        .progress-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 24px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.35);
+            transition: color 0.3s ease;
+        }
+
+        .progress-step.active {
+            color: #81c784;
+        }
+
+        .progress-step.completed {
+            color: #4caf50;
+        }
+
+        .step-number {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active .step-number {
+            background: linear-gradient(135deg, #43a047, #2e7d32);
+            border-color: #4caf50;
+            box-shadow: 0 0 12px rgba(76, 175, 80, 0.4);
+        }
+
+        .progress-step.completed .step-number {
+            background: #4caf50;
+            border-color: #4caf50;
+        }
+
+        .progress-line {
+            width: 40px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.12);
+            margin: 0 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: #4caf50;
+            transition: width 0.4s ease;
+        }
+
+        .progress-line.filled::after {
+            width: 100%;
+        }
+
+        /* Form Row for side-by-side fields */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            opacity: 0.5;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            border: 1.5px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            color: white;
+            font-size: 0.92rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .input-wrapper input::placeholder {
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .input-wrapper input:hover {
+            border-color: rgba(76, 175, 80, 0.4);
+            background: rgba(255, 255, 255, 0.09);
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #4caf50;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.15);
+        }
+
+        .input-wrapper input:focus~.input-icon {
+            opacity: 0.9;
+        }
+
+        .input-wrapper input.error {
+            border-color: #ff4757;
+            box-shadow: 0 0 0 4px rgba(255, 71, 87, 0.12);
+            animation: shake 0.4s ease;
+        }
+
+        .input-wrapper input.valid {
+            border-color: #4caf50;
+        }
+
+        .field-hint {
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 4px;
+        }
+
+        .field-error {
+            font-size: 0.72rem;
+            color: #ff4757;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .field-error.show {
+            display: block;
+        }
+
+        /* Password strength meter */
+        .password-strength {
+            display: flex;
+            gap: 4px;
+            margin-top: 6px;
+        }
+
+        .strength-bar {
+            flex: 1;
+            height: 3px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .strength-bar.weak {
+            background: #ff4757;
+        }
+
+        .strength-bar.medium {
+            background: #ffa502;
+        }
+
+        .strength-bar.strong {
+            background: #4caf50;
+        }
+
+        .strength-text {
+            font-size: 0.7rem;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .strength-text.weak {
+            color: #ff4757;
+        }
+
+        .strength-text.medium {
+            color: #ffa502;
+        }
+
+        .strength-text.strong {
+            color: #4caf50;
+        }
+
+        /* Toggle password visibility */
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-password:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Role Selector */
+        .role-selector {
+            margin-bottom: 16px;
+        }
+
+        .role-selector>label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .role-toggle {
+            display: flex;
+            gap: 0;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 4px;
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .role-toggle input[type="radio"] {
+            display: none;
+        }
+
+        .role-toggle label {
+            flex: 1;
+            text-align: center;
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.55);
+            cursor: pointer;
+            border-radius: 9px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: none;
+            letter-spacing: 0;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .role-toggle input[type="radio"]:checked+label {
+            background: linear-gradient(135deg, rgba(67, 160, 103, 0.6), rgba(46, 125, 79, 0.5));
+            color: white;
+            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+            backdrop-filter: blur(8px);
+        }
+
+        .role-toggle label:hover {
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .role-toggle input[type="radio"]:checked+label:hover {
+            background: linear-gradient(135deg, rgba(67, 160, 103, 0.7), rgba(46, 125, 79, 0.6));
+            color: white;
+        }
+
+        .role-icon {
+            font-size: 1.05rem;
+        }
+
+        /* Terms checkbox */
+        .terms-group {
+            margin-bottom: 20px;
+        }
+
+        .terms-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        .terms-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #4caf50;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .terms-label a {
+            color: #81c784;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .terms-label a:hover {
+            color: #a5d6a7;
+            text-decoration: underline;
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 24px rgba(46, 125, 50, 0.35);
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 36px rgba(46, 125, 50, 0.5);
+        }
+
+        .register-btn:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .register-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .register-btn .btn-loading {
+            display: none;
+        }
+
+        .register-btn.loading .btn-text {
+            visibility: hidden;
+        }
+
+        .register-btn.loading .btn-loading {
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .spinner {
+            width: 22px;
+            height: 22px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 18px 0;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.82rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 12px;
+        }
+
+        .social-link {
+            flex: 1;
+            padding: 11px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .social-link:hover {
+            border-color: #66bb6a;
+            background: rgba(76, 175, 80, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .social-link svg {
+            flex-shrink: 0;
+        }
+
+        .login-prompt {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 0.88rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .login-prompt a {
+            color: #81c784;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+            margin-left: 4px;
+        }
+
+        .login-prompt a:hover {
+            color: #a5d6a7;
+        }
+
+        .register-msg {
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.88rem;
+            font-weight: 500;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        .register-msg.success {
+            background: rgba(129, 199, 132, 0.15);
+            color: #81c784;
+            border: 1px solid rgba(129, 199, 132, 0.3);
+        }
+
+        .register-msg.error {
+            background: rgba(255, 71, 87, 0.15);
+            color: #ff4757;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        .home-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 10;
+            font-size: 0.9rem;
+        }
+
+        .home-link:hover {
+            color: #a5d6a7;
+            transform: translateX(-5px);
+        }
+
+        /* ========== Responsive Design ========== */
+
+        /* Tablet landscape */
+        @media (max-width: 920px) {
+            .register-container {
+                grid-template-columns: 1fr 1.3fr;
+            }
+
+            .register-branding {
+                padding: 35px 28px;
+            }
+
+            .brand-content h1 {
+                font-size: 1.7rem;
+            }
+
+            .register-form-wrapper {
+                padding: 32px 28px;
+            }
+        }
+
+        /* Tablet portrait */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 0;
+            }
+
+            .register-container {
+                grid-template-columns: 1fr;
+            }
+
+            .register-branding {
+                display: none;
+            }
+
+            .register-form-wrapper {
+                padding: 30px 28px;
+            }
+
+            .form-header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            .form-header h2 {
+                font-size: 1.4rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .form-group {
+                margin-bottom: 14px;
+            }
+
+            .role-selector {
+                margin-bottom: 14px;
+            }
+
+            .divider {
+                margin: 14px 0;
+            }
+
+            .login-prompt {
+                margin-top: 14px;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 520px) {
+            body {
+                padding: 16px 0;
+            }
+
+            .register-wrapper {
+                padding: 12px;
+            }
+
+            .register-form-wrapper {
+                padding: 24px 20px;
+            }
+
+            .form-header h2 {
+                font-size: 1.25rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .role-toggle label {
+                padding: 9px 12px;
+                font-size: 0.82rem;
+            }
+
+            .progress-step span:not(.step-number) {
+                display: none;
+            }
+
+            .progress-line {
+                width: 28px;
+            }
+
+            .social-link {
+                padding: 10px;
+                font-size: 0.8rem;
+            }
+
+            .social-link span {
+                display: none;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 360px) {
+            .register-form-wrapper {
+                padding: 20px 16px;
+            }
+
+            .form-header h2 {
+                font-size: 1.15rem;
+            }
+
+            .input-wrapper input {
+                padding: 10px 12px 10px 36px;
+                font-size: 0.88rem;
+            }
+
+            .register-btn {
+                padding: 12px 14px;
+                font-size: 0.92rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Extra floating blob -->
+    <div
+        style="position:fixed;top:40%;left:50%;width:350px;height:350px;background:radial-gradient(circle,rgba(129,199,132,0.4) 0%,transparent 70%);border-radius:50%;animation:blob1 25s ease-in-out infinite reverse;z-index:0;">
+    </div>
+
+
+
+    <div class="register-wrapper">
+        <div class="register-container">
+            <!-- Left Side - Branding -->
+            <div class="register-branding">
+                <div class="brand-header">
+                    <span class="logo-icon">🧹🌿</span>
+                    <span class="logo-text">CLEANIFY</span>
+                </div>
+                <div class="brand-content">
+                    <h1>Join the Clean City Movement</h1>
+                    <p>Create your account and start making a difference. Together, we can build cleaner, healthier
+                        communities for everyone.</p>
+                    <ul class="features-list">
+                        <li>
+                            <span class="feature-icon">📍</span>
+                            Report issues in your neighbourhood instantly
+                        </li>
+                        <li>
+                            <span class="feature-icon">📊</span>
+                            Track progress with real-time dashboards
+                        </li>
+                        <li>
+                            <span class="feature-icon">🤝</span>
+                            Connect with local authorities directly
+                        </li>
+                        <li>
+                            <span class="feature-icon">🏆</span>
+                            Earn rewards for your contributions
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Right Side - Registration Form -->
+            <div class="register-form-wrapper">
+                <div class="form-header">
+                    <h2>Create Your Account</h2>
+                    <p>Fill in your details to get started</p>
+                </div>
+
+                <!-- Progress Steps -->
+                <div class="progress-bar">
+                    <div class="progress-step active" id="step1-indicator">
+                        <span class="step-number">1</span>
+                        <span>Info</span>
+                    </div>
+                    <div class="progress-line" id="line1"></div>
+                    <div class="progress-step" id="step2-indicator">
+                        <span class="step-number">2</span>
+                        <span>Security</span>
+                    </div>
+                    <div class="progress-line" id="line2"></div>
+                    <div class="progress-step" id="step3-indicator">
+                        <span class="step-number">3</span>
+                        <span>Done</span>
+                    </div>
+                </div>
+
+                <form id="registerForm" onsubmit="return handleRegister(event)" novalidate>
+                    <!-- Row 1: Full Name & Phone -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fullname">Full Name</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">👤</span>
+                                <input type="text" id="fullname" placeholder="John Doe" required autocomplete="name">
+                            </div>
+                            <div class="field-error" id="fullname-error">Please enter your full name</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">📱</span>
+                                <input type="tel" id="phone" placeholder="+91 XXXXX XXXXX" required autocomplete="tel">
+                            </div>
+                            <div class="field-error" id="phone-error">Enter a valid phone number</div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Email -->
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">✉️</span>
+                            <input type="email" id="email" placeholder="you@example.com" required autocomplete="email">
+                        </div>
+                        <div class="field-error" id="email-error">Please enter a valid email address</div>
+                    </div>
+
+                    <!-- Row 3: Password & Confirm Password -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pwd">Password</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">🔒</span>
+                                <input type="password" id="pwd" placeholder="Min 8 characters" required
+                                    autocomplete="new-password">
+                                <button type="button" class="toggle-password" onclick="toggleVisibility('pwd', this)"
+                                    aria-label="Toggle password visibility">👁️</button>
+                            </div>
+                            <div class="password-strength" id="strengthMeter">
+                                <div class="strength-bar" id="bar1"></div>
+                                <div class="strength-bar" id="bar2"></div>
+                                <div class="strength-bar" id="bar3"></div>
+                                <div class="strength-bar" id="bar4"></div>
+                            </div>
+                            <div class="strength-text" id="strengthText"></div>
+                            <div class="field-error" id="pwd-error">Password must be at least 8 characters</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmPwd">Confirm Password</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">🔒</span>
+                                <input type="password" id="confirmPwd" placeholder="Re-enter password" required
+                                    autocomplete="new-password">
+                                <button type="button" class="toggle-password"
+                                    onclick="toggleVisibility('confirmPwd', this)"
+                                    aria-label="Toggle password visibility">👁️</button>
+                            </div>
+                            <div class="field-error" id="confirmPwd-error">Passwords do not match</div>
+                        </div>
+                    </div>
+
+                    <!-- Role Selector -->
+                    <div class="role-selector">
+                        <label>Register As</label>
+                        <div class="role-toggle">
+                            <input type="radio" id="role-user" name="role" value="user" checked>
+                            <label for="role-user"><span class="role-icon">👤</span> Citizen</label>
+                            <input type="radio" id="role-admin" name="role" value="admin">
+                            <label for="role-admin"><span class="role-icon">🛡️</span> Authority</label>
+                        </div>
+                    </div>
+
+                    <!-- Terms -->
+                    <div class="terms-group">
+                        <label class="terms-label">
+                            <input type="checkbox" id="terms" required>
+                            <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy
+                                    Policy</a></span>
+                        </label>
+                        <div class="field-error" id="terms-error">You must accept the terms to continue</div>
+                    </div>
+
+                    <button type="submit" class="register-btn" id="registerBtn">
+                        <span class="btn-text">Create Account</span>
+                        <span class="btn-loading">
+                            <div class="spinner"></div>
+                        </span>
+                    </button>
+                </form>
+
+                <p id="registerMsg" class="register-msg" style="display: none;"></p>
+
+                <div class="divider">
+                    <span>or register with</span>
+                </div>
+
+                <div class="social-links">
+                    <a href="#" class="social-link" title="Google">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                            fill="currentColor">
+                            <path
+                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
+                            <path
+                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                            <path
+                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                            <path
+                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                        </svg>
+                        <span>Google</span>
+                    </a>
+                    <a href="#" class="social-link" title="GitHub">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                            fill="currentColor">
+                            <path
+                                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                        </svg>
+                        <span>GitHub</span>
+                    </a>
+                </div>
+
+                <p class="login-prompt">
+                    Already have an account?<a href="index.html">Sign In</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === Password Visibility Toggle ===
+        function toggleVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁️';
+            }
+        }
+
+        // === Password Strength Meter ===
+        const pwdInput = document.getElementById('pwd');
+        pwdInput.addEventListener('input', function () {
+            const val = this.value;
+            let score = 0;
+            if (val.length >= 8) score++;
+            if (/[A-Z]/.test(val)) score++;
+            if (/[0-9]/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val)) score++;
+
+            const bars = ['bar1', 'bar2', 'bar3', 'bar4'];
+            const strengthText = document.getElementById('strengthText');
+
+            bars.forEach((id, i) => {
+                const bar = document.getElementById(id);
+                bar.className = 'strength-bar';
+                if (i < score) {
+                    if (score <= 1) bar.classList.add('weak');
+                    else if (score <= 2) bar.classList.add('medium');
+                    else bar.classList.add('strong');
+                }
+            });
+
+            if (val.length === 0) {
+                strengthText.textContent = '';
+                strengthText.className = 'strength-text';
+            } else if (score <= 1) {
+                strengthText.textContent = 'Weak';
+                strengthText.className = 'strength-text weak';
+            } else if (score <= 2) {
+                strengthText.textContent = 'Medium';
+                strengthText.className = 'strength-text medium';
+            } else {
+                strengthText.textContent = 'Strong';
+                strengthText.className = 'strength-text strong';
+            }
+
+            updateProgress();
+        });
+
+        // === Real-time Validation ===
+        document.getElementById('confirmPwd').addEventListener('input', function () {
+            const pwd = document.getElementById('pwd').value;
+            const confirmError = document.getElementById('confirmPwd-error');
+            if (this.value && this.value !== pwd) {
+                this.classList.add('error');
+                this.classList.remove('valid');
+                confirmError.classList.add('show');
+            } else if (this.value && this.value === pwd) {
+                this.classList.remove('error');
+                this.classList.add('valid');
+                confirmError.classList.remove('show');
+            } else {
+                this.classList.remove('error', 'valid');
+                confirmError.classList.remove('show');
+            }
+            updateProgress();
+        });
+
+        document.getElementById('email').addEventListener('input', function () {
+            const emailError = document.getElementById('email-error');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (this.value && !emailRegex.test(this.value)) {
+                this.classList.add('error');
+                this.classList.remove('valid');
+                emailError.classList.add('show');
+            } else if (this.value && emailRegex.test(this.value)) {
+                this.classList.remove('error');
+                this.classList.add('valid');
+                emailError.classList.remove('show');
+            } else {
+                this.classList.remove('error', 'valid');
+                emailError.classList.remove('show');
+            }
+            updateProgress();
+        });
+
+        document.getElementById('fullname').addEventListener('input', function () {
+            updateProgress();
+        });
+
+        document.getElementById('phone').addEventListener('input', function () {
+            updateProgress();
+        });
+
+        // === Progress Bar Updates ===
+        function updateProgress() {
+            const fullname = document.getElementById('fullname').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const pwd = document.getElementById('pwd').value;
+            const confirmPwd = document.getElementById('confirmPwd').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            const step1Done = fullname.length > 0 && phone.length > 0 && email.length > 0 && emailRegex.test(email);
+            const step2Done = pwd.length >= 8 && confirmPwd === pwd;
+
+            const step1Ind = document.getElementById('step1-indicator');
+            const step2Ind = document.getElementById('step2-indicator');
+            const step3Ind = document.getElementById('step3-indicator');
+            const line1 = document.getElementById('line1');
+            const line2 = document.getElementById('line2');
+
+            if (step1Done) {
+                step1Ind.className = 'progress-step completed';
+                step1Ind.querySelector('.step-number').textContent = '✓';
+                line1.classList.add('filled');
+                step2Ind.classList.add('active');
+            } else {
+                step1Ind.className = 'progress-step active';
+                step1Ind.querySelector('.step-number').textContent = '1';
+                line1.classList.remove('filled');
+                step2Ind.classList.remove('active');
+            }
+
+            if (step1Done && step2Done) {
+                step2Ind.className = 'progress-step completed';
+                step2Ind.querySelector('.step-number').textContent = '✓';
+                line2.classList.add('filled');
+                step3Ind.classList.add('active');
+            } else if (step1Done) {
+                step2Ind.className = 'progress-step active';
+                step2Ind.querySelector('.step-number').textContent = '2';
+                line2.classList.remove('filled');
+                step3Ind.classList.remove('active');
+            } else {
+                step2Ind.className = 'progress-step';
+                step2Ind.querySelector('.step-number').textContent = '2';
+                line2.classList.remove('filled');
+                step3Ind.classList.remove('active');
+            }
+        }
+
+        // === Form Validation ===
+        function validateForm() {
+            let isValid = true;
+            const fullname = document.getElementById('fullname');
+            const phone = document.getElementById('phone');
+            const email = document.getElementById('email');
+            const pwd = document.getElementById('pwd');
+            const confirmPwd = document.getElementById('confirmPwd');
+            const terms = document.getElementById('terms');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!fullname.value.trim()) {
+                fullname.classList.add('error');
+                document.getElementById('fullname-error').classList.add('show');
+                isValid = false;
+            } else {
+                fullname.classList.remove('error');
+                fullname.classList.add('valid');
+                document.getElementById('fullname-error').classList.remove('show');
+            }
+
+            if (!phone.value.trim() || phone.value.trim().length < 10) {
+                phone.classList.add('error');
+                document.getElementById('phone-error').classList.add('show');
+                isValid = false;
+            } else {
+                phone.classList.remove('error');
+                phone.classList.add('valid');
+                document.getElementById('phone-error').classList.remove('show');
+            }
+
+            if (!email.value.trim() || !emailRegex.test(email.value)) {
+                email.classList.add('error');
+                document.getElementById('email-error').classList.add('show');
+                isValid = false;
+            } else {
+                email.classList.remove('error');
+                email.classList.add('valid');
+                document.getElementById('email-error').classList.remove('show');
+            }
+
+            if (pwd.value.length < 8) {
+                pwd.classList.add('error');
+                document.getElementById('pwd-error').classList.add('show');
+                isValid = false;
+            } else {
+                pwd.classList.remove('error');
+                pwd.classList.add('valid');
+                document.getElementById('pwd-error').classList.remove('show');
+            }
+
+            if (confirmPwd.value !== pwd.value) {
+                confirmPwd.classList.add('error');
+                document.getElementById('confirmPwd-error').classList.add('show');
+                isValid = false;
+            } else {
+                confirmPwd.classList.remove('error');
+                confirmPwd.classList.add('valid');
+                document.getElementById('confirmPwd-error').classList.remove('show');
+            }
+
+            if (!terms.checked) {
+                document.getElementById('terms-error').classList.add('show');
+                isValid = false;
+            } else {
+                document.getElementById('terms-error').classList.remove('show');
+            }
+
+            return isValid;
+        }
+
+        // === Registration using Backend API ===
+        async function handleRegister(event) {
+            event.preventDefault();
+
+            if (!validateForm()) return false;
+
+            const btn = document.getElementById('registerBtn');
+            const registerMsg = document.getElementById('registerMsg');
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            const fullname = document.getElementById('fullname').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('pwd').value;
+            const role = document.querySelector('input[name="role"]:checked').value;
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullname, phone, email, password, role })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Registration failed');
+
+                localStorage.setItem('cleanify_token', data.token);
+                localStorage.setItem('cleanify_role', data.role);
+
+                showMessage(registerMsg, '🎉 Account created successfully! Redirecting...', 'success');
+                document.getElementById('step3-indicator').className = 'progress-step completed';
+                document.getElementById('step3-indicator').querySelector('.step-number').textContent = '✓';
+
+                setTimeout(() => {
+                    if (data.role === 'admin') window.location.href = './admin.html';
+                    else window.location.href = './user.html';
+                }, 1500);
+            } catch(err) {
+                showMessage(registerMsg, '⚠️ ' + err.message, 'error');
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+
+            return false;
+        }
+
+        function showMessage(element, message, type) {
+            element.innerText = message;
+            element.className = `register-msg ${type}`;
+            element.style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>

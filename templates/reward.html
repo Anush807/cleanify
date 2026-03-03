@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rewards - Cleanify</title>
+    <link rel="stylesheet" href="../static/User.css">
+</head>
+<body>
+    <nav>
+        <h2>🌿 CLEANIFY</h2>
+        <ul>
+            <li><a href="./user.html">Home</a></li>
+            <li><a href="./report.html">Report Issue</a></li>
+            <li><a href="./ai.html">AI Classifier</a></li>
+            <li><a href="./eco.html">Eco Store</a></li>
+            <li><a href="./reward.html">Rewards</a></li>
+            <li>
+                <select id="languageSwitcher">
+                    <option value="en">🌐 English</option>
+                    <option value="hi">🇮🇳 हिंदी</option>
+                    <option value="kn">🇮🇳 ಕನ್ನಡ</option>
+                    <option value="te">🇮🇳 తెలుగు</option>
+                    <option value="mr">🇮🇳 मराठी</option>
+                </select>
+            </li>
+            <li><button onclick="logout()" style="background:none;border:1px solid rgba(255,255,255,0.4);color:white;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;">🚪 Logout</button></li>
+        </ul>
+    </nav>
+
+    <div class="rewards">
+        <!-- Profile Summary -->
+        <div style="text-align:center;margin-bottom:25px;">
+            <div style="width:80px;height:80px;background:linear-gradient(135deg,#1a7f44,#65a53b);border-radius:50%;margin:0 auto 15px;display:flex;align-items:center;justify-content:center;font-size:35px;box-shadow:0 8px 25px rgba(26,127,68,0.3);">
+                👤
+            </div>
+            <h2 id="profileName" style="margin:0;color:#1a7f44;">Loading...</h2>
+        </div>
+
+        <!-- Points Card -->
+        <div style="background:linear-gradient(135deg,#1a7f44,#65a53b);color:white;padding:25px;border-radius:16px;text-align:center;margin-bottom:25px;box-shadow:0 8px 30px rgba(26,127,68,0.3);">
+            <p style="margin:0;font-size:14px;opacity:0.9;">Total Green Points</p>
+            <h1 style="font-size:2.5rem;margin:10px 0;">🌟 <span id="totalPoints">—</span></h1>
+            <span id="nextLevelMsg" style="background:rgba(255,255,255,0.2);padding:5px 15px;border-radius:20px;font-size:13px;">🎯 Loading...</span>
+        </div>
+
+        <!-- Badges -->
+        <h3 style="color:#1a7f44;margin-bottom:15px;">🏆 Your Badges</h3>
+        <div id="badgesContainer">
+            <div style="text-align:center;color:#999;padding:20px;">Loading badges...</div>
+        </div>
+
+        <!-- Recent Activity -->
+        <h3 style="color:#1a7f44;margin:25px 0 15px;">📊 Recent Complaints</h3>
+        <div id="activityContainer" style="background:#f9f9f9;border-radius:12px;padding:15px;">
+            <div style="text-align:center;color:#999;">Loading activity...</div>
+        </div>
+
+        <!-- Global Rewards -->
+        <h3 style="color:#1a7f44;margin:25px 0 15px;">🌟 Community Rewards</h3>
+        <div id="communityRewards" style="background:#f9f9f9;border-radius:12px;padding:15px;">
+            <div style="text-align:center;color:#999;">Loading...</div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Swachhta Platform | Built for a Clean India 🇮🇳</p>
+    </footer>
+
+    <script>
+        const API = '';
+        function getToken() { return localStorage.getItem('cleanify_token'); }
+        function logout() {
+            fetch(`${API}/api/auth/logout`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + getToken() } });
+            localStorage.clear();
+            window.location.href = './index.html';
+        }
+        if (!getToken()) { window.location.href = './index.html'; }
+
+        async function loadProfile() {
+            try {
+                const res = await fetch(`${API}/api/profile`, {
+                    headers: { 'Authorization': 'Bearer ' + getToken() }
+                });
+                const profile = await res.json();
+                if (!res.ok) throw new Error();
+
+                document.getElementById('profileName').textContent = `${profile.fullname} — Level ${profile.level}`;
+                document.getElementById('totalPoints').textContent = profile.green_points;
+                document.getElementById('nextLevelMsg').textContent = `🎯 ${profile.points_to_next} more points to next level`;
+
+                // Render badges
+                const badgesHtml = profile.badges.map(b => `
+                    <div class="badge" style="${b.earned ? '' : 'opacity:0.6;'}">
+                        <p>${b.name}</p>
+                        ${b.earned
+                            ? `<span style="background:#1a7f44;color:white;padding:5px 12px;border-radius:15px;font-size:12px;">✓ Earned</span>`
+                            : `<span style="background:#ccc;color:#666;padding:5px 12px;border-radius:15px;font-size:12px;">🔒 ${b.progress || 0}/${b.max}</span>`
+                        }
+                    </div>
+                `).join('');
+                document.getElementById('badgesContainer').innerHTML = badgesHtml;
+
+            } catch {
+                document.getElementById('profileName').textContent = 'Unable to load profile';
+            }
+        }
+
+        async function loadActivity() {
+            try {
+                const res = await fetch(`${API}/api/complaints`, {
+                    headers: { 'Authorization': 'Bearer ' + getToken() }
+                });
+                const complaints = await res.json();
+
+                if (!complaints.length) {
+                    document.getElementById('activityContainer').innerHTML = `<p style="text-align:center;color:#999;">No complaints filed yet.</p>`;
+                    return;
+                }
+
+                const icons = { dumping:'🚛', washroom:'🚿', bin:'🗑️', drain:'🕳️', medical:'💊', industrial:'🏭', animal:'🐾' };
+                const recentHtml = complaints.slice(0, 5).map(c => `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;">
+                        <span>${icons[c.issueType] || '📋'} ${c.issueType || 'Issue'} — ${c.location}</span>
+                        <div style="text-align:right;">
+                            <span style="color:#1a7f44;font-weight:600;">+15 pts</span><br>
+                            <span style="font-size:11px;color:#999;">${new Date(c.timestamp).toLocaleDateString('en-IN')}</span>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('activityContainer').innerHTML = recentHtml;
+            } catch {
+                document.getElementById('activityContainer').innerHTML = `<p style="color:#999;text-align:center;">Unable to load activity.</p>`;
+            }
+        }
+
+        async function loadCommunityRewards() {
+            try {
+                const res = await fetch(`${API}/api/rewards`, {
+                    headers: { 'Authorization': 'Bearer ' + getToken() }
+                });
+                const rewards = await res.json();
+
+                if (!rewards.length) {
+                    document.getElementById('communityRewards').innerHTML = `<p style="text-align:center;color:#999;">No community rewards yet.</p>`;
+                    return;
+                }
+
+                const html = rewards.slice(0, 5).map(r => `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;">
+                        <div>
+                            <strong>${r.recipient}</strong>
+                            <span style="font-size:12px;color:#666;display:block;">${r.reward_type} — ${r.reason || ''}</span>
+                        </div>
+                        <span style="color:#1a7f44;font-weight:600;">+${r.points} pts</span>
+                    </div>
+                `).join('');
+                document.getElementById('communityRewards').innerHTML = html;
+            } catch {
+                document.getElementById('communityRewards').innerHTML = `<p style="color:#999;text-align:center;">Unable to load.</p>`;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadProfile();
+            loadActivity();
+            loadCommunityRewards();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Unclean Washroom - Cleanify</title>
+    <link rel="stylesheet" href="../static/User.css">
+</head>
+<body>
+    <nav>
+        <h2>🌿 CLEANIFY</h2>
+        <ul>
+            <li><a href='./user.html'>Home</a></li>
+            <li><a href='./report.html'>Report Issue</a></li>
+            <li><a href='./ai.html'>AI Classifier</a></li>
+            <li><a href='./eco.html'>Eco Store</a></li>
+            <li><a href='./reward.html'>Rewards</a></li>
+            <li>
+                <select id="languageSwitcher" onchange="changeLanguage()">
+                    <option value="en">🌐 English</option>
+                    <option value="hi">🇮🇳 हिंदी</option>
+                    <option value="kn">🇮🇳 ಕನ್ನಡ</option>
+                    <option value="te">🇮🇳 తెలుగు</option>
+                    <option value="mr">🇮🇳 मराठी</option>
+                </select>
+            </li>
+            <li><button onclick="logout()" style="background:none;border:1px solid rgba(255,255,255,0.4);color:white;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;">🚪 Logout</button></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h2>🚿 Report an Unclean Washroom</h2>
+
+        <form id="washroomForm">
+            <label for="location">Washroom Location / Landmark</label>
+            <input type="text" id="location" placeholder="e.g., Near Bus Stand, Sector 22" required />
+
+            <label for="severity">Severity Level</label>
+            <select id="severity">
+                <option value="low">Low (Minor Unclean)</option>
+                <option value="medium">Medium (Needs Cleaning Soon)</option>
+                <option value="high">High (Very Dirty / Unusable)</option>
+            </select>
+
+            <label for="photo">Upload Photo</label>
+            <input type="file" id="photo" accept="image/*" />
+
+            <label for="details">Additional Details</label>
+            <textarea id="details" placeholder="Describe the condition..."></textarea>
+
+            <button type="submit" id="submitBtn">🚀 Submit Complaint</button>
+        </form>
+
+        <div id="successMessage" style="display:none;margin-top:20px;padding:20px;background:linear-gradient(135deg,#e8ffe8,#c8f0c8);border-radius:12px;text-align:center;">
+            <h3 style="color:#1a7f44;">✅ Complaint Submitted!</h3>
+            <p>Your complaint ID: <strong id="complaintId"></strong></p>
+            <div id="pointsMsg" style="margin-top:10px;padding:8px;background:rgba(26,127,68,0.15);border-radius:8px;font-size:14px;color:#1a7f44;font-weight:600;display:none;"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Swachhta Platform | Built for a Clean India 🇮🇳</p>
+    </footer>
+
+    <script>
+        const API = '';
+        function getToken() { return localStorage.getItem('cleanify_token'); }
+        function logout() {
+            fetch(`${API}/api/auth/logout`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + getToken() } });
+            localStorage.clear();
+            window.location.href = './index.html';
+        }
+        if (!getToken()) { window.location.href = './index.html'; }
+
+        document.getElementById('washroomForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Submitting...';
+
+            const location = document.getElementById('location').value;
+            const severity = document.getElementById('severity').value;
+            const details = document.getElementById('details').value;
+            const photoInput = document.getElementById('photo');
+
+            async function getImageBase64() {
+                return new Promise((resolve) => {
+                    if (!photoInput.files || !photoInput.files[0]) return resolve('');
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const maxW = 200;
+                            const scale = maxW / img.width;
+                            canvas.width = maxW;
+                            canvas.height = img.height * scale;
+                            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                            resolve(canvas.toDataURL('image/jpeg', 0.5));
+                        };
+                        img.src = ev.target.result;
+                    };
+                    reader.readAsDataURL(photoInput.files[0]);
+                });
+            }
+
+            try {
+                const imageData = await getImageBase64();
+                const res = await fetch(`${API}/api/complaints`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getToken()
+                    },
+                    body: JSON.stringify({
+                        type: 'washroom',
+                        issueType: 'washroom',
+                        severity,
+                        location,
+                        description: details || 'Unclean washroom reported',
+                        image: imageData
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Submission failed');
+
+                document.getElementById('complaintId').textContent = data.id;
+                document.getElementById('successMessage').style.display = 'block';
+                if (data.points_awarded) {
+                    const pm = document.getElementById('pointsMsg');
+                    pm.textContent = `✨ +${data.points_awarded} Green Points Earned!`;
+                    pm.style.display = 'block';
+                }
+                this.reset();
+            } catch (err) {
+                alert('Error: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🚀 Submit Complaint';
+            }
+        });
+
+        async function changeLanguage() {
+            const lang = document.getElementById("languageSwitcher").value;
+            localStorage.setItem('preferredLanguage', lang);
+        }
+    </script>
+</body>
+</html>

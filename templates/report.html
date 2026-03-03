@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Issue - Cleanify</title>
+    <meta name="description" content="Report waste dumping, overflowing bins, and other cleanliness issues in your area">
+    <link rel="stylesheet" href="../static/User.css">
+</head>
+<body>
+
+    <nav>
+        <h2 data-key="title">🌿 CLEANIFY</h2>
+        <ul>
+            <li><a href="./user.html" data-key="home">Home</a></li>
+            <li><a href="./report.html" data-key="report">Report Issue</a></li>
+            <li><a href="./ai.html" data-key="ai">AI Classifier</a></li>
+            <li><a href="./eco.html" data-key="eco">Eco Store</a></li>
+            <li><a href="./reward.html" data-key="reward">Rewards</a></li>
+            <li>
+                <select id="languageSwitcher" onchange="changeLanguage()">
+                    <option value="en">🌐 English</option>
+                    <option value="hi">🇮🇳 हिंदी</option>
+                    <option value="kn">🇮🇳 ಕನ್ನಡ</option>
+                    <option value="te">🇮🇳 తెలుగు</option>
+                    <option value="mr">🇮🇳 मराठी</option>
+                    <option value="ta">🇮🇳 தமிழ்</option>
+                    <option value="bn">🇮🇳 বাংলা</option>
+                    <option value="gu">🇮🇳 ગુજરાતી</option>
+                </select>
+            </li>
+            <li><button onclick="logout()" style="background:none;border:1px solid rgba(255,255,255,0.4);color:white;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;">🚪 Logout</button></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h2 data-key="reportTitle">📋 Report an Issue</h2>
+
+        <form id="reportForm">
+            <label for="issueType" data-key="issueLabel">Select Issue Type:</label>
+            <select id="issueType" required>
+                <option value="">-- Select --</option>
+                <option value="dumping">High Dumping Area</option>
+                <option value="washroom">Unclean Washroom</option>
+                <option value="bin">Overflowing Bin</option>
+                <option value="drain">Blocked Drain</option>
+                <option value="medical">Medical Waste Dump</option>
+                <option value="industrial">Industrial Waste</option>
+                <option value="animal">Dead Animals</option>
+            </select>
+
+            <label for="imageUpload" data-key="photoLabel">Upload Image:</label>
+            <input type="file" id="imageUpload" accept="image/*">
+
+            <label for="location" data-key="locationLabel">Location (Auto-detected or enter manually):</label>
+            <input type="text" id="location" placeholder="Enter Location or use GPS" required>
+            <button type="button" onclick="getLocation()" style="margin-top: 10px; width: auto; padding: 10px 20px;">
+                📍 Detect My Location
+            </button>
+
+            <label for="description" data-key="descLabel">Description:</label>
+            <textarea id="description" rows="5" placeholder="Describe the issue in detail..." required></textarea>
+
+            <button type="submit" data-key="submitBtn" id="submitBtn">🚀 Submit Complaint</button>
+        </form>
+
+        <div id="successMessage" style="display: none; margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #e8ffe8, #c8f0c8); border-radius: 12px; text-align: center;">
+            <h3 style="color: #1a7f44;">✅ Complaint Submitted Successfully!</h3>
+            <p>Your complaint ID: <strong id="complaintId"></strong></p>
+            <p>We will review and take action within 48 hours.</p>
+            <div id="pointsMsg" style="margin-top:10px;padding:8px;background:rgba(26,127,68,0.15);border-radius:8px;font-size:14px;color:#1a7f44;font-weight:600;display:none;"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Swachhta Platform | Built for a Clean India 🇮🇳</p>
+    </footer>
+
+    <script>
+        const API = '';
+        function getToken() { return localStorage.getItem('cleanify_token'); }
+        function logout() {
+            fetch(`${API}/api/auth/logout`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + getToken() } });
+            localStorage.clear();
+            window.location.href = './index.html';
+        }
+
+        // Redirect if not logged in
+        if (!getToken()) { window.location.href = './index.html'; }
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        document.getElementById('location').value = `Lat: ${pos.coords.latitude.toFixed(6)}, Lng: ${pos.coords.longitude.toFixed(6)}`;
+                    },
+                    () => alert('Unable to get location. Please enter manually.')
+                );
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+
+        document.getElementById('reportForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Submitting...';
+
+            const issueType = document.getElementById('issueType').value;
+            const location = document.getElementById('location').value;
+            const description = document.getElementById('description').value;
+            const imageInput = document.getElementById('imageUpload');
+
+            async function getImageBase64() {
+                return new Promise((resolve) => {
+                    if (!imageInput.files || !imageInput.files[0]) return resolve('');
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const maxW = 200;
+                            const scale = maxW / img.width;
+                            canvas.width = maxW;
+                            canvas.height = img.height * scale;
+                            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                            resolve(canvas.toDataURL('image/jpeg', 0.5));
+                        };
+                        img.src = ev.target.result;
+                    };
+                    reader.readAsDataURL(imageInput.files[0]);
+                });
+            }
+
+            try {
+                const imageData = await getImageBase64();
+                const res = await fetch(`${API}/api/complaints`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + getToken()
+                    },
+                    body: JSON.stringify({
+                        type: 'report',
+                        issueType,
+                        location,
+                        description,
+                        image: imageData
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Submission failed');
+
+                document.getElementById('complaintId').textContent = data.id;
+                document.getElementById('successMessage').style.display = 'block';
+                if (data.points_awarded) {
+                    const pm = document.getElementById('pointsMsg');
+                    pm.textContent = `✨ +${data.points_awarded} Green Points Earned!`;
+                    pm.style.display = 'block';
+                }
+                this.reset();
+                document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                alert('Error: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🚀 Submit Complaint';
+            }
+        });
+
+        // Translation
+        const translations = {
+            en: {
+                title: "🌿 CLEANIFY", home: "Home", report: "Report Issue", ai: "AI Classifier",
+                eco: "Eco Store", reward: "Rewards", reportTitle: "📋 Report an Issue",
+                issueLabel: "Select Issue Type:", photoLabel: "Upload Image:",
+                locationLabel: "Location (Auto-detected or enter manually):",
+                descLabel: "Description:", submitBtn: "🚀 Submit Complaint"
+            }
+        };
+        const translationCache = {};
+        async function fetchTranslation(text, targetLang) {
+            if (targetLang === "en") return text;
+            const cacheKey = text + "|" + targetLang;
+            if (translationCache[cacheKey]) return translationCache[cacheKey];
+            try {
+                const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${targetLang}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                return translationCache[cacheKey] = data.responseData.translatedText;
+            } catch { return text; }
+        }
+        async function changeLanguage() {
+            const lang = document.getElementById("languageSwitcher").value;
+            localStorage.setItem('preferredLanguage', lang);
+            for (let el of document.querySelectorAll("[data-key]")) {
+                const key = el.getAttribute("data-key");
+                const orig = translations.en[key];
+                if (!orig) continue;
+                el.textContent = lang === "en" ? orig : await fetchTranslation(orig, lang);
+            }
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('preferredLanguage');
+            if (savedLang && savedLang !== 'en') {
+                document.getElementById('languageSwitcher').value = savedLang;
+                changeLanguage();
+            }
+        });
+    </script>
+</body>
+</html>
