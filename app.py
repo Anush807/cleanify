@@ -29,11 +29,19 @@ except Exception as e:
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = secrets.token_hex(32)
-CORS(app, supports_credentials=True, origins=[
-    "https://cleanify-frontend-eight.vercel.app",
-    "http://localhost:5500",
-    "http://127.0.0.1:5500"
-])
+CORS(app, 
+     resources={r"/api/*": {"origins": "https://cleanify-frontend-eight.vercel.app"}},
+     supports_credentials=True,
+     allow_headers=["Content-Type", "Authorization"],
+     methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"])
+
+     @app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', 'https://cleanify-frontend-eight.vercel.app')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
 
 # ─────────────────────────────────────────────
 # DATABASE SETUP (PostgreSQL)

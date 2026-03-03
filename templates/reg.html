@@ -1346,11 +1346,12 @@
             const role = document.querySelector('input[name="role"]:checked').value;
 
             try {
-                const res = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fullname, phone, email, password, role })
-                });
+               const API = 'https://cleanify-6yh1.onrender.com';
+const res = await fetch(`${API}/api/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fullname, phone, email, password, role })
+});
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Registration failed');
 
