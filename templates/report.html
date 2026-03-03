@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Report Issue - Cleanify</title>
     <meta name="description" content="Report waste dumping, overflowing bins, and other cleanliness issues in your area">
-    <link rel="stylesheet" href="../static/User.css">
+    <link rel="stylesheet" href="./static/User.css">
 </head>
 <body>
 
@@ -77,7 +77,7 @@
     </footer>
 
     <script>
-        const API = '';
+        const API = 'https://cleanify-6yh1.onrender.com';
         function getToken() { return localStorage.getItem('cleanify_token'); }
         function logout() {
             fetch(`${API}/api/auth/logout`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + getToken() } });

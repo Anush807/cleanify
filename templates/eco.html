@@ -71,7 +71,7 @@
     </style>
 
     <script>
-        const API = '';
+        const API = 'https://cleanify-6yh1.onrender.com';
         function getToken(){return localStorage.getItem('cleanify_token');}
         function logout(){
             fetch(`${API}/api/auth/logout`,{method:'POST',headers:{'Authorization':'Bearer '+getToken()}});
