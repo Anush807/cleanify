@@ -29,7 +29,7 @@ except Exception as e:
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = secrets.token_hex(32)
-CORS(app, supports_credentials=True, origins=["*"])
+CORS(app, supports_credentials=True, origins=["cleanify-frontend-eight.vercel.app"])
 
 # ─────────────────────────────────────────────
 # DATABASE SETUP (PostgreSQL)
