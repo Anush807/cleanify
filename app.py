@@ -29,7 +29,7 @@ app.secret_key = secrets.token_hex(32)
 
 # ── CORS ──
 CORS(app, supports_credentials=True,
-     origins=["https://swachtha.vercel.app",
+     origins=["https://swachtha.vercel.app/",
                "http://localhost:5500", "http://127.0.0.1:5500"])
 
 @app.after_request
