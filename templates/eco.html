@@ -4,7 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eco Store - Cleanify</title>
-    <link rel="stylesheet" href="./user.css">
+    <link rel="stylesheet" href="./static/User.css">
+    <style>
+        .eco-badge{position:absolute;top:15px;left:15px;background:linear-gradient(135deg,#1a7f44,#65a53b);color:white;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;}
+        .price{font-size:1.2rem;font-weight:700;color:#1a7f44;margin:8px 0;}
+        .rating{font-size:13px;color:#f1c40f;margin-bottom:6px;}
+        .buy-btn{width:100%;padding:10px;background:linear-gradient(135deg,#1a7f44,#65a53b);color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;margin-top:6px;}
+        .buy-btn:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(26,127,68,0.3);}
+        .flipkart-btn{width:100%;padding:9px;background:linear-gradient(135deg,#2874f0,#1a5bbf);color:white;border:none;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;margin-top:5px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;}
+        .flipkart-btn:hover{opacity:0.9;}
+        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1a7f44,#256410);color:white;padding:13px 28px;border-radius:30px;box-shadow:0 8px 30px rgba(0,0,0,0.3);z-index:9999;animation:slideUp 0.3s ease;font-weight:600;font-size:14px;}
+        @keyframes slideUp{from{opacity:0;transform:translate(-50%,20px);}to{opacity:1;transform:translate(-50%,0);}}
+    </style>
 </head>
 <body>
     <nav>
@@ -30,7 +41,7 @@
 
     <h2 class="section-title" style="margin-top:30px;" data-key="storeTitle">🛒 Eco-Friendly Store</h2>
     <p style="text-align:center;color:white;margin-bottom:20px;text-shadow:0 2px 10px rgba(0,0,0,0.2);" data-key="storeSubtitle">
-        Shop sustainable products and earn green points!
+        Shop sustainable products, earn green points, and buy directly on Flipkart!
     </p>
 
     <!-- Cart indicator -->
@@ -39,14 +50,71 @@
     </div>
 
     <section class="store-grid">
-        <div class="item" data-price="120"><div class="eco-badge">🌱 Eco-Friendly</div><img src="https://cdn-icons-png.flaticon.com/512/891/891419.png" alt="Paper Bags"><h3>Paper Bags</h3><p class="price">₹120 / pack</p><div class="rating">⭐⭐⭐⭐⭐ (4.8)</div><button onclick="addToCart('Paper Bags',120)">🛒 Add to Cart</button></div>
-        <div class="item" data-price="890"><div class="eco-badge">♻️ Compostable</div><img src="https://cdn-icons-png.flaticon.com/512/1047/1047711.png" alt="Compost Bin"><h3>Compost Bin</h3><p class="price">₹890</p><div class="rating">⭐⭐⭐⭐ (4.5)</div><button onclick="addToCart('Compost Bin',890)">🛒 Add to Cart</button></div>
-        <div class="item" data-price="150"><div class="eco-badge">🌿 Biodegradable</div><img src="https://cdn-icons-png.flaticon.com/512/706/706164.png" alt="Jute Bags"><h3>Jute Bags</h3><p class="price">₹150</p><div class="rating">⭐⭐⭐⭐⭐ (4.9)</div><button onclick="addToCart('Jute Bags',150)">🛒 Add to Cart</button></div>
-        <div class="item" data-price="80"><div class="eco-badge">📚 Recycled</div><img src="https://cdn-icons-png.flaticon.com/512/684/684908.png" alt="Recycled Notebooks"><h3>Recycled Notebooks</h3><p class="price">₹80</p><div class="rating">⭐⭐⭐⭐ (4.3)</div><button onclick="addToCart('Recycled Notebooks',80)">🛒 Add to Cart</button></div>
-        <div class="item" data-price="60"><div class="eco-badge">🎋 Bamboo</div><img src="https://cdn-icons-png.flaticon.com/512/3081/3081769.png" alt="Bamboo Toothbrush"><h3>Bamboo Toothbrush</h3><p class="price">₹60</p><div class="rating">⭐⭐⭐⭐⭐ (4.7)</div><button onclick="addToCart('Bamboo Toothbrush',60)">🛒 Add to Cart</button></div>
-        <div class="item" data-price="199"><div class="eco-badge">🥤 Reusable</div><img src="https://cdn-icons-png.flaticon.com/512/3134/3134258.png" alt="Steel Straw Set"><h3>Steel Straw Set</h3><p class="price">₹199</p><div class="rating">⭐⭐⭐⭐ (4.6)</div><button onclick="addToCart('Steel Straw Set',199)">🛒 Add to Cart</button></div>
-        <div class="item" data-price="250"><div class="eco-badge">🧺 Washable</div><img src="https://cdn-icons-png.flaticon.com/512/3093/3093390.png" alt="Cloth Napkins"><h3>Cloth Napkins</h3><p class="price">₹250 / set</p><div class="rating">⭐⭐⭐⭐⭐ (4.8)</div><button onclick="addToCart('Cloth Napkins',250)">🛒 Add to Cart</button></div>
-        <div class="item" data-price="45"><div class="eco-badge">🌱 Organic</div><img src="https://cdn-icons-png.flaticon.com/512/854/854866.png" alt="Plant Seeds"><h3>Plant Seeds Kit</h3><p class="price">₹45</p><div class="rating">⭐⭐⭐⭐ (4.4)</div><button onclick="addToCart('Plant Seeds Kit',45)">🛒 Add to Cart</button></div>
+        <!-- Each product has: add to cart + buy on flipkart -->
+        <div class="item" style="position:relative;">
+            <div class="eco-badge">🌱 Eco-Friendly</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/891/891419.png" alt="Paper Bags">
+            <h3>Paper Bags</h3><p class="price">₹120 / pack</p>
+            <div class="rating">⭐⭐⭐⭐⭐ (4.8)</div>
+            <button class="buy-btn" onclick="addToCart('Paper Bags',120)">🛒 Add to Cart</button>
+            <a class="flipkart-btn" href="https://www.flipkart.com/search?q=paper+bags+eco+friendly" target="_blank">🛍️ Buy on Flipkart</a>
+        </div>
+        <div class="item" style="position:relative;">
+            <div class="eco-badge">♻️ Compostable</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/1047/1047711.png" alt="Compost Bin">
+            <h3>Compost Bin</h3><p class="price">₹890</p>
+            <div class="rating">⭐⭐⭐⭐ (4.5)</div>
+            <button class="buy-btn" onclick="addToCart('Compost Bin',890)">🛒 Add to Cart</button>
+            <a class="flipkart-btn" href="https://www.flipkart.com/search?q=compost+bin+home" target="_blank">🛍️ Buy on Flipkart</a>
+        </div>
+        <div class="item" style="position:relative;">
+            <div class="eco-badge">🌿 Biodegradable</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/706/706164.png" alt="Jute Bags">
+            <h3>Jute Bags</h3><p class="price">₹150</p>
+            <div class="rating">⭐⭐⭐⭐⭐ (4.9)</div>
+            <button class="buy-btn" onclick="addToCart('Jute Bags',150)">🛒 Add to Cart</button>
+            <a class="flipkart-btn" href="https://www.flipkart.com/search?q=jute+bags+reusable" target="_blank">🛍️ Buy on Flipkart</a>
+        </div>
+        <div class="item" style="position:relative;">
+            <div class="eco-badge">📚 Recycled</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/684/684908.png" alt="Recycled Notebooks">
+            <h3>Recycled Notebooks</h3><p class="price">₹80</p>
+            <div class="rating">⭐⭐⭐⭐ (4.3)</div>
+            <button class="buy-btn" onclick="addToCart('Recycled Notebooks',80)">🛒 Add to Cart</button>
+            <a class="flipkart-btn" href="https://www.flipkart.com/search?q=recycled+paper+notebooks" target="_blank">🛍️ Buy on Flipkart</a>
+        </div>
+        <div class="item" style="position:relative;">
+            <div class="eco-badge">🎋 Bamboo</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/3081/3081769.png" alt="Bamboo Toothbrush">
+            <h3>Bamboo Toothbrush</h3><p class="price">₹60</p>
+            <div class="rating">⭐⭐⭐⭐⭐ (4.7)</div>
+            <button class="buy-btn" onclick="addToCart('Bamboo Toothbrush',60)">🛒 Add to Cart</button>
+            <a class="flipkart-btn" href="https://www.flipkart.com/search?q=bamboo+toothbrush" target="_blank">🛍️ Buy on Flipkart</a>
+        </div>
+        <div class="item" style="position:relative;">
+            <div class="eco-badge">🥤 Reusable</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/3134/3134258.png" alt="Steel Straw Set">
+            <h3>Steel Straw Set</h3><p class="price">₹199</p>
+            <div class="rating">⭐⭐⭐⭐ (4.6)</div>
+            <button class="buy-btn" onclick="addToCart('Steel Straw Set',199)">🛒 Add to Cart</button>
+            <a class="flipkart-btn" href="https://www.flipkart.com/search?q=steel+straw+reusable" target="_blank">🛍️ Buy on Flipkart</a>
+        </div>
+        <div class="item" style="position:relative;">
+            <div class="eco-badge">🧺 Washable</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/3093/3093390.png" alt="Cloth Napkins">
+            <h3>Cloth Napkins</h3><p class="price">₹250 / set</p>
+            <div class="rating">⭐⭐⭐⭐⭐ (4.8)</div>
+            <button class="buy-btn" onclick="addToCart('Cloth Napkins',250)">🛒 Add to Cart</button>
+            <a class="flipkart-btn" href="https://www.flipkart.com/search?q=cloth+napkins+reusable" target="_blank">🛍️ Buy on Flipkart</a>
+        </div>
+        <div class="item" style="position:relative;">
+            <div class="eco-badge">🌱 Organic</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/854/854866.png" alt="Plant Seeds">
+            <h3>Plant Seeds Kit</h3><p class="price">₹45</p>
+            <div class="rating">⭐⭐⭐⭐ (4.4)</div>
+            <button class="buy-btn" onclick="addToCart('Plant Seeds Kit',45)">🛒 Add to Cart</button>
+            <a class="flipkart-btn" href="https://www.flipkart.com/search?q=plant+seeds+kit+gardening" target="_blank">🛍️ Buy on Flipkart</a>
+        </div>
     </section>
 
     <!-- Cart Modal -->
@@ -56,19 +124,11 @@
             <h3 style="color:#1a7f44;margin-bottom:20px;">🛒 Your Cart</h3>
             <div id="cartItems"></div>
             <div id="cartSummary" style="margin-top:20px;padding-top:15px;border-top:2px solid #eee;"></div>
-            <button id="checkoutBtn" onclick="checkout()" style="width:100%;margin-top:15px;padding:13px;background:linear-gradient(135deg,#1a7f44,#65a53b);color:white;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;">🌿 Confirm Purchase</button>
+            <button id="checkoutBtn" onclick="checkout()" style="width:100%;margin-top:15px;padding:13px;background:linear-gradient(135deg,#1a7f44,#65a53b);color:white;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;">🌿 Confirm Purchase & Earn Points</button>
         </div>
     </div>
 
     <footer><p>© 2026 Swachhta Platform | Built for a Clean India 🇮🇳</p></footer>
-
-    <style>
-        .eco-badge{position:absolute;top:15px;left:15px;background:linear-gradient(135deg,#1a7f44,#65a53b);color:white;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;}
-        .price{font-size:1.2rem;font-weight:700;color:#1a7f44;margin:8px 0;}
-        .rating{font-size:13px;color:#f1c40f;margin-bottom:8px;}
-        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1a7f44,#256410);color:white;padding:13px 28px;border-radius:30px;box-shadow:0 8px 30px rgba(0,0,0,0.3);z-index:9999;animation:slideUp 0.3s ease;font-weight:600;font-size:14px;}
-        @keyframes slideUp{from{opacity:0;transform:translate(-50%,20px);}to{opacity:1;transform:translate(-50%,0);}}
-    </style>
 
     <script>
         const API = 'https://cleanify-6yh1.onrender.com';
@@ -78,124 +138,72 @@
             localStorage.clear(); window.location.href='./index.html';
         }
         if(!getToken()){window.location.href='./index.html';}
-
         let cart = [];
-
         function addToCart(name, price) {
-            const existing = cart.find(i => i.name === name);
-            if (existing) { existing.qty++; } 
-            else { cart.push({name, price, qty:1}); }
-            updateCartUI();
-            showToast(`✅ ${name} added to cart!`);
+            const ex = cart.find(i=>i.name===name);
+            if(ex) ex.qty++; else cart.push({name,price,qty:1});
+            updateCartUI(); showToast(`✅ ${name} added to cart!`);
         }
-
         function updateCartUI() {
-            const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
-            const count = cart.reduce((s,i) => s + i.qty, 0);
+            const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+            const count = cart.reduce((s,i)=>s+i.qty,0);
             document.getElementById('cartCount').textContent = count;
             document.getElementById('cartTotal').textContent = total;
             document.getElementById('cartIndicator').style.display = cart.length ? 'block' : 'none';
         }
-
         function showCart() {
-            const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
-            const pts = Math.floor(total / 10);
+            const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+            const pts = Math.floor(total/10);
             document.getElementById('cartItems').innerHTML = cart.length
-                ? cart.map(i => `
+                ? cart.map(i=>`
                     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0f0f0;">
-                        <div>
-                            <strong>${i.name}</strong>
-                            <div style="font-size:12px;color:#999;">₹${i.price} × ${i.qty}</div>
-                        </div>
+                        <div><strong>${i.name}</strong><div style="font-size:12px;color:#999;">₹${i.price} × ${i.qty}</div></div>
                         <div style="display:flex;align-items:center;gap:8px;">
-                            <button onclick="changeQty('${i.name}',-1)" style="width:28px;height:28px;border-radius:50%;border:1px solid #ddd;background:white;cursor:pointer;font-size:16px;">−</button>
+                            <button onclick="changeQty('${i.name}',-1)" style="width:28px;height:28px;border-radius:50%;border:1px solid #ddd;background:white;cursor:pointer;">−</button>
                             <span style="font-weight:600;">${i.qty}</span>
-                            <button onclick="changeQty('${i.name}',1)" style="width:28px;height:28px;border-radius:50%;border:1px solid #ddd;background:white;cursor:pointer;font-size:16px;">+</button>
+                            <button onclick="changeQty('${i.name}',1)" style="width:28px;height:28px;border-radius:50%;border:1px solid #ddd;background:white;cursor:pointer;">+</button>
                             <strong style="color:#1a7f44;min-width:60px;text-align:right;">₹${i.price*i.qty}</strong>
                         </div>
                     </div>`).join('')
                 : '<p style="color:#999;text-align:center;padding:20px;">Your cart is empty</p>';
-
             document.getElementById('cartSummary').innerHTML = `
-                <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:#333;">
-                    <span>Total</span><span>₹${total}</span>
-                </div>
-                <div style="margin-top:8px;padding:8px;background:rgba(26,127,68,0.08);border-radius:8px;font-size:13px;color:#1a7f44;text-align:center;">
-                    🌿 You'll earn <strong>${pts} Green Points</strong> on this purchase!
-                </div>`;
-
+                <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:#333;"><span>Total</span><span>₹${total}</span></div>
+                <div style="margin-top:8px;padding:8px;background:rgba(26,127,68,0.08);border-radius:8px;font-size:13px;color:#1a7f44;text-align:center;">🌿 You'll earn <strong>${pts} Green Points</strong> on this purchase!</div>`;
             document.getElementById('checkoutBtn').style.display = cart.length ? 'block' : 'none';
             document.getElementById('cartModal').style.display = 'flex';
         }
-
         function changeQty(name, delta) {
-            const item = cart.find(i => i.name === name);
-            if (!item) return;
+            const item = cart.find(i=>i.name===name);
+            if(!item) return;
             item.qty += delta;
-            if (item.qty <= 0) cart = cart.filter(i => i.name !== name);
+            if(item.qty<=0) cart = cart.filter(i=>i.name!==name);
             updateCartUI();
-            if (cart.length) showCart(); else closeCart();
+            if(cart.length) showCart(); else closeCart();
         }
-
-        function closeCart() {
-            document.getElementById('cartModal').style.display = 'none';
-        }
-
+        function closeCart() { document.getElementById('cartModal').style.display='none'; }
         async function checkout() {
-            if (!cart.length) return;
+            if(!cart.length) return;
             const btn = document.getElementById('checkoutBtn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Processing...';
+            btn.disabled = true; btn.textContent = '⏳ Processing...';
             try {
-                const res = await fetch(`${API}/api/eco/purchase`, {
-                    method: 'POST',
-                    headers: {'Content-Type':'application/json','Authorization':'Bearer '+getToken()},
-                    body: JSON.stringify({items: cart.map(i => ({name:i.name, price:i.price*i.qty}))})
-                });
+                const res = await fetch(`${API}/api/eco/purchase`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},body:JSON.stringify({items:cart.map(i=>({name:i.name,price:i.price*i.qty}))})});
                 const data = await res.json();
-                if (!res.ok) throw new Error(data.error);
-                closeCart();
-                cart = [];
-                updateCartUI();
+                if(!res.ok) throw new Error(data.error);
+                closeCart(); cart = []; updateCartUI();
                 showToast(`🎉 Purchase complete! +${data.points_awarded} Green Points earned!`);
-            } catch(err) {
-                showToast('❌ ' + err.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '🌿 Confirm Purchase';
-            }
+            } catch(err) { showToast('❌ '+err.message); }
+            finally { btn.disabled=false; btn.textContent='🌿 Confirm Purchase & Earn Points'; }
         }
-
         function showToast(msg) {
-            const t = document.createElement('div');
-            t.className = 'toast';
-            t.textContent = msg;
+            const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
             document.body.appendChild(t);
-            setTimeout(()=>{ t.style.animation='slideUp 0.3s ease reverse'; setTimeout(()=>t.remove(),300); }, 2500);
+            setTimeout(()=>{t.style.animation='slideUp 0.3s ease reverse';setTimeout(()=>t.remove(),300);},2500);
         }
-
-        // Translation
-        const translations = { en: { title:"🌿 CLEANIFY", storeTitle:"🛒 Eco-Friendly Store", storeSubtitle:"Shop sustainable products and earn green points!" } };
-        const translationCache = {};
-        async function fetchTranslation(text,lang){
-            if(lang==="en")return text;
-            const k=text+"|"+lang;
-            if(translationCache[k])return translationCache[k];
-            try{const r=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${lang}`);const d=await r.json();return translationCache[k]=d.responseData.translatedText;}catch{return text;}
-        }
-        async function changeLanguage(){
-            const lang=document.getElementById("languageSwitcher").value;
-            localStorage.setItem('preferredLanguage',lang);
-            for(let el of document.querySelectorAll("[data-key]")){
-                const orig=translations.en[el.getAttribute("data-key")];
-                if(!orig)continue;
-                el.textContent=lang==="en"?orig:await fetchTranslation(orig,lang);
-            }
-        }
-        window.addEventListener('DOMContentLoaded',()=>{
-            const l=localStorage.getItem('preferredLanguage');
-            if(l&&l!=='en'){document.getElementById('languageSwitcher').value=l;changeLanguage();}
-        });
+        const T = { en:{ title:'🌿 CLEANIFY', storeTitle:'🛒 Eco-Friendly Store', storeSubtitle:'Shop sustainable products, earn green points, and buy directly on Flipkart!' }};
+        const cache = {};
+        async function fetchT(text,lang){if(lang==='en')return text;const k=text+'|'+lang;if(cache[k])return cache[k];try{const r=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${lang}`);const d=await r.json();return cache[k]=d.responseData.translatedText;}catch{return text;}}
+        async function changeLanguage(){const lang=document.getElementById('languageSwitcher').value;localStorage.setItem('preferredLanguage',lang);for(const el of document.querySelectorAll('[data-key]')){const orig=T.en[el.getAttribute('data-key')];if(!orig)continue;el.textContent=lang==='en'?orig:await fetchT(orig,lang);}}
+        window.addEventListener('DOMContentLoaded',()=>{const l=localStorage.getItem('preferredLanguage');if(l&&l!=='en'){document.getElementById('languageSwitcher').value=l;changeLanguage();}});
     </script>
 </body>
 </html>

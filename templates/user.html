@@ -8,18 +8,23 @@
 </head>
 <body>
     <nav>
-        <h2>🌿 CLEANIFY</h2>
+        <h2 data-key="title">🌿 CLEANIFY</h2>
         <ul>
-            <li><a href="./user.html">Home</a></li>
-            <li><a href="./report.html">Report Issue</a></li>
-            <li><a href="./ai.html">AI Classifier</a></li>
-            <li><a href="./eco.html">Eco Store</a></li>
-            <li><a href="./reward.html">Rewards</a></li>
+            <li><a href="./user.html" data-key="home">Home</a></li>
+            <li><a href="./report.html" data-key="report">Report Issue</a></li>
+            <li><a href="./ai.html" data-key="ai">AI Classifier</a></li>
+            <li><a href="./eco.html" data-key="eco">Eco Store</a></li>
+            <li><a href="./reward.html" data-key="rewards">Rewards</a></li>
             <li>
-                <select id="languageSwitcher">
+                <select id="languageSwitcher" onchange="changeLanguage()">
                     <option value="en">🌐 English</option>
                     <option value="hi">🇮🇳 हिंदी</option>
                     <option value="kn">🇮🇳 ಕನ್ನಡ</option>
+                    <option value="te">🇮🇳 తెలుగు</option>
+                    <option value="mr">🇮🇳 मराठी</option>
+                    <option value="ta">🇮🇳 தமிழ்</option>
+                    <option value="bn">🇮🇳 বাংলা</option>
+                    <option value="gu">🇮🇳 ગુજરાતી</option>
                 </select>
             </li>
             <li><button onclick="logout()" style="background:none;border:1px solid rgba(255,255,255,0.4);color:white;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;">🚪 Logout</button></li>
@@ -29,8 +34,8 @@
     <div class="container" style="max-width:900px;">
         <div style="text-align:center;margin-bottom:30px;">
             <div style="font-size:80px;">🌿</div>
-            <h1 id="welcomeMsg" style="color:#1a7f44;font-size:2rem;margin:10px 0;">Welcome back!</h1>
-            <p style="color:#666;">Together we build a cleaner, greener city.</p>
+            <h1 id="welcomeMsg" data-key="welcome" style="color:#1a7f44;font-size:2rem;margin:10px 0;">Welcome back!</h1>
+            <p data-key="tagline" style="color:#666;">Together we build a cleaner, greener city.</p>
         </div>
 
         <!-- Quick Stats -->
@@ -38,119 +43,147 @@
             <div style="background:white;border-radius:14px;padding:20px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,0.08);">
                 <div style="font-size:30px;">🌟</div>
                 <div id="userPoints" style="font-size:1.8rem;font-weight:700;color:#1a7f44;">—</div>
-                <div style="font-size:13px;color:#666;">Green Points</div>
+                <div data-key="greenPoints" style="font-size:13px;color:#666;">Green Points</div>
             </div>
             <div style="background:white;border-radius:14px;padding:20px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,0.08);">
                 <div style="font-size:30px;">📋</div>
                 <div id="userComplaints" style="font-size:1.8rem;font-weight:700;color:#1a7f44;">—</div>
-                <div style="font-size:13px;color:#666;">Reports Filed</div>
+                <div data-key="reportsFiled" style="font-size:13px;color:#666;">Reports Filed</div>
             </div>
             <div style="background:white;border-radius:14px;padding:20px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,0.08);">
                 <div style="font-size:30px;">✅</div>
                 <div id="userResolved" style="font-size:1.8rem;font-weight:700;color:#1a7f44;">—</div>
-                <div style="font-size:13px;color:#666;">Resolved</div>
+                <div data-key="resolved" style="font-size:13px;color:#666;">Resolved</div>
             </div>
             <div style="background:white;border-radius:14px;padding:20px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,0.08);">
                 <div style="font-size:30px;">🏆</div>
                 <div id="userLevel" style="font-size:1.8rem;font-weight:700;color:#1a7f44;">—</div>
-                <div style="font-size:13px;color:#666;">Level</div>
+                <div data-key="level" style="font-size:13px;color:#666;">Level</div>
             </div>
         </div>
 
         <!-- Quick Actions -->
-        <h3 style="color:#1a7f44;margin-bottom:15px;">⚡ Quick Actions</h3>
+        <h3 data-key="quickActions" style="color:#1a7f44;margin-bottom:15px;">⚡ Quick Actions</h3>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:30px;">
             <a href="./report.html" style="background:linear-gradient(135deg,#1a7f44,#65a53b);color:white;padding:20px;border-radius:14px;text-decoration:none;text-align:center;transition:transform 0.2s;">
                 <div style="font-size:30px;margin-bottom:8px;">📋</div>
-                <strong>Report an Issue</strong>
-                <p style="font-size:12px;opacity:0.85;margin-top:4px;">Dumping, bins, drains</p>
+                <strong data-key="reportAction">Report an Issue</strong>
+                <p data-key="reportSub" style="font-size:12px;opacity:0.85;margin-top:4px;">Dumping, bins, drains</p>
             </a>
             <a href="./ai.html" style="background:linear-gradient(135deg,#2196F3,#1565C0);color:white;padding:20px;border-radius:14px;text-decoration:none;text-align:center;transition:transform 0.2s;">
                 <div style="font-size:30px;margin-bottom:8px;">🤖</div>
-                <strong>AI Waste Classifier</strong>
-                <p style="font-size:12px;opacity:0.85;margin-top:4px;">Dry or Wet waste?</p>
+                <strong data-key="aiAction">AI Waste Classifier</strong>
+                <p data-key="aiSub" style="font-size:12px;opacity:0.85;margin-top:4px;">Dry, Wet or E-Waste?</p>
             </a>
             <a href="./washroom.html" style="background:linear-gradient(135deg,#9C27B0,#6A1B9A);color:white;padding:20px;border-radius:14px;text-decoration:none;text-align:center;transition:transform 0.2s;">
                 <div style="font-size:30px;margin-bottom:8px;">🚿</div>
-                <strong>Washroom Report</strong>
-                <p style="font-size:12px;opacity:0.85;margin-top:4px;">Unclean washroom</p>
+                <strong data-key="washroomAction">Washroom Report</strong>
+                <p data-key="washroomSub" style="font-size:12px;opacity:0.85;margin-top:4px;">Unclean washroom</p>
             </a>
             <a href="./eco.html" style="background:linear-gradient(135deg,#FF9800,#E65100);color:white;padding:20px;border-radius:14px;text-decoration:none;text-align:center;transition:transform 0.2s;">
                 <div style="font-size:30px;margin-bottom:8px;">🛒</div>
-                <strong>Eco Store</strong>
-                <p style="font-size:12px;opacity:0.85;margin-top:4px;">Sustainable products</p>
+                <strong data-key="ecoAction">Eco Store</strong>
+                <p data-key="ecoSub" style="font-size:12px;opacity:0.85;margin-top:4px;">Sustainable products</p>
+            </a>
+            <a href="./waste.html" style="background:linear-gradient(135deg,#00897B,#00695C);color:white;padding:20px;border-radius:14px;text-decoration:none;text-align:center;transition:transform 0.2s;">
+                <div style="font-size:30px;margin-bottom:8px;">🚛</div>
+                <strong data-key="trackAction">Track Waste Picker</strong>
+                <p data-key="trackSub" style="font-size:12px;opacity:0.85;margin-top:4px;">Live location tracking</p>
             </a>
         </div>
 
         <!-- Recent Complaints -->
-        <h3 style="color:#1a7f44;margin-bottom:15px;">📋 My Recent Reports</h3>
+        <h3 data-key="recentReports" style="color:#1a7f44;margin-bottom:15px;">📋 My Recent Reports</h3>
         <div id="recentComplaints" style="background:white;border-radius:14px;padding:20px;box-shadow:0 4px 15px rgba(0,0,0,0.08);">
             <p style="color:#999;text-align:center;">Loading...</p>
         </div>
     </div>
 
-    <footer>
-        <p>© 2026 Swachhta Platform | Built for a Clean India 🇮🇳</p>
-    </footer>
+    <footer><p>© 2026 Swachhta Platform | Built for a Clean India 🇮🇳</p></footer>
 
     <script>
         const API = 'https://cleanify-6yh1.onrender.com';
         function getToken() { return localStorage.getItem('cleanify_token'); }
         function logout() {
-            fetch(`${API}/api/auth/logout`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + getToken() } });
-            localStorage.clear();
-            window.location.href = './index.html';
+            fetch(`${API}/api/auth/logout`, { method:'POST', headers:{'Authorization':'Bearer '+getToken()} });
+            localStorage.clear(); window.location.href = './index.html';
         }
         if (!getToken()) { window.location.href = './index.html'; }
 
-        const icons = { dumping:'🚛', washroom:'🚿', bin:'🗑️', drain:'🕳️', medical:'💊', industrial:'🏭', animal:'🐾' };
-        const statusColors = { 'Pending': '#f39c12', 'In Progress': '#3498db', 'Resolved': '#27ae60', 'Rejected': '#e74c3c' };
+        const icons = { dumping:'🚛', washroom:'🚿', bin:'🗑️', drain:'🕳️', medical:'💊', industrial:'🏭', animal:'🐾', ewaste:'💻' };
+        const statusColors = { 'Pending':'#f39c12', 'In Progress':'#3498db', 'Resolved':'#27ae60', 'Rejected':'#e74c3c' };
 
         async function loadData() {
             try {
                 const [profileRes, complaintsRes] = await Promise.all([
-                    fetch(`${API}/api/profile`, { headers: { 'Authorization': 'Bearer ' + getToken() } }),
-                    fetch(`${API}/api/complaints`, { headers: { 'Authorization': 'Bearer ' + getToken() } })
+                    fetch(`${API}/api/profile`, { headers:{'Authorization':'Bearer '+getToken()} }),
+                    fetch(`${API}/api/complaints`, { headers:{'Authorization':'Bearer '+getToken()} })
                 ]);
-
                 if (profileRes.status === 401) { window.location.href = './index.html'; return; }
-
                 const profile = await profileRes.json();
                 const complaints = await complaintsRes.json();
-
                 document.getElementById('welcomeMsg').textContent = `Welcome back, ${profile.fullname}! 👋`;
                 document.getElementById('userPoints').textContent = profile.green_points;
                 document.getElementById('userComplaints').textContent = profile.total_complaints;
                 document.getElementById('userResolved').textContent = profile.resolved_complaints;
                 document.getElementById('userLevel').textContent = profile.level;
-
                 if (!complaints.length) {
-                    document.getElementById('recentComplaints').innerHTML = `
-                        <p style="text-align:center;color:#999;">No reports filed yet. <a href="./report.html" style="color:#1a7f44;">Report your first issue!</a></p>`;
+                    document.getElementById('recentComplaints').innerHTML = `<p style="text-align:center;color:#999;">No reports filed yet. <a href="./report.html" style="color:#1a7f44;">Report your first issue!</a></p>`;
                     return;
                 }
-
-                const html = complaints.slice(0, 5).map(c => `
+                document.getElementById('recentComplaints').innerHTML = complaints.slice(0,5).map(c => `
                     <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f0f0f0;">
                         <div style="display:flex;align-items:center;gap:10px;">
-                            <span style="font-size:20px;">${icons[c.issueType] || '📋'}</span>
+                            <span style="font-size:20px;">${icons[c.issueType]||'📋'}</span>
                             <div>
-                                <strong style="font-size:14px;">${c.location || 'Unknown location'}</strong>
-                                <div style="font-size:12px;color:#999;">${c.description?.substring(0,50) || ''}${c.description?.length > 50 ? '...' : ''}</div>
+                                <strong style="font-size:14px;">${c.location||'Unknown location'}</strong>
+                                <div style="font-size:12px;color:#999;">${(c.description||'').substring(0,50)}${(c.description||'').length>50?'...':''}</div>
                                 <div style="font-size:11px;color:#bbb;">${new Date(c.timestamp).toLocaleDateString('en-IN')}</div>
                             </div>
                         </div>
                         <span style="padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;background:${statusColors[c.status]}22;color:${statusColors[c.status]};">${c.status}</span>
-                    </div>
-                `).join('');
-                document.getElementById('recentComplaints').innerHTML = html;
-
-            } catch (err) {
-                console.error(err);
-            }
+                    </div>`).join('');
+            } catch(err) { console.error(err); }
         }
 
-        window.addEventListener('DOMContentLoaded', loadData);
+        // ── Translation System (8 languages) ──
+        const T = {
+            en: { title:'🌿 CLEANIFY', home:'Home', report:'Report Issue', ai:'AI Classifier', eco:'Eco Store', rewards:'Rewards',
+                  welcome:'Welcome back!', tagline:'Together we build a cleaner, greener city.', greenPoints:'Green Points',
+                  reportsFiled:'Reports Filed', resolved:'Resolved', level:'Level', quickActions:'⚡ Quick Actions',
+                  reportAction:'Report an Issue', reportSub:'Dumping, bins, drains', aiAction:'AI Waste Classifier',
+                  aiSub:'Dry, Wet or E-Waste?', washroomAction:'Washroom Report', washroomSub:'Unclean washroom',
+                  ecoAction:'Eco Store', ecoSub:'Sustainable products', trackAction:'Track Waste Picker',
+                  trackSub:'Live location tracking', recentReports:'📋 My Recent Reports' }
+        };
+        const cache = {};
+        async function translate(text, lang) {
+            if (lang === 'en') return text;
+            const k = text+'|'+lang;
+            if (cache[k]) return cache[k];
+            try {
+                const r = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${lang}`);
+                const d = await r.json();
+                return cache[k] = d.responseData.translatedText;
+            } catch { return text; }
+        }
+        async function changeLanguage() {
+            const lang = document.getElementById('languageSwitcher').value;
+            localStorage.setItem('preferredLanguage', lang);
+            for (const el of document.querySelectorAll('[data-key]')) {
+                const key = el.getAttribute('data-key');
+                if (!T.en[key]) continue;
+                el.textContent = lang === 'en' ? T.en[key] : await translate(T.en[key], lang);
+            }
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            const saved = localStorage.getItem('preferredLanguage');
+            if (saved && saved !== 'en') {
+                document.getElementById('languageSwitcher').value = saved;
+                changeLanguage();
+            }
+        });
     </script>
 </body>
 </html>

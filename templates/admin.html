@@ -7,7 +7,7 @@
     <title>Admin Dashboard - CLEANIFY</title>
     <meta name="description"
         content="CLEANIFY Admin Dashboard - Manage and review citizen complaints about waste dumping, unclean washrooms, and other cleanliness issues.">
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./static/styles.css">
 </head>
 
 <body>
@@ -110,6 +110,7 @@
                 <button class="filter-btn" onclick="filterComplaints('washroom', this)">🚿 Washroom</button>
                 <button class="filter-btn" onclick="filterComplaints('pending', this)">⏳ Pending</button>
                 <button class="filter-btn" onclick="filterComplaints('resolved', this)">✅ Resolved</button>
+                <button class="filter-btn" onclick="filterComplaints('inprogress', this)">🔄 In Progress</button>
                 <div class="search-box">
                     <span>🔍</span>
                     <input type="text" id="searchInput" placeholder="Search complaints..." oninput="searchComplaints()">
@@ -598,6 +599,7 @@
             else if (currentFilter === 'washroom') filtered = filtered.filter(c => c.type === 'washroom');
             else if (currentFilter === 'pending') filtered = filtered.filter(c => c.status === 'Pending');
             else if (currentFilter === 'resolved') filtered = filtered.filter(c => c.status === 'Resolved');
+            else if (currentFilter === 'inprogress') filtered = filtered.filter(c => c.status === 'In Progress');
             if (searchTerm) {
                 filtered = filtered.filter(c =>
                     (c.id||'').toLowerCase().includes(searchTerm) ||

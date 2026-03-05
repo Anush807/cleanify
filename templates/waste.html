@@ -3,8 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waste Picker Schedule - Cleanify</title>
-    <link rel="stylesheet" href="./user.css">
+    <title>Track Waste Picker - Cleanify</title>
+    <link rel="stylesheet" href="./static/User.css">
+    <style>
+        .tracker-card { background:white; border-radius:16px; padding:24px; box-shadow:0 4px 20px rgba(0,0,0,0.1); margin-bottom:20px; }
+        .map-container { background:linear-gradient(135deg,#e8f5e9,#f1f8e9); border-radius:16px; padding:20px; margin-bottom:20px; min-height:320px; position:relative; overflow:hidden; border:2px solid rgba(26,127,68,0.15); }
+        .road-h { position:absolute; background:#d0d0d0; height:6px; left:0; right:0; border-radius:3px; }
+        .road-v { position:absolute; background:#d0d0d0; width:6px; top:0; bottom:0; border-radius:3px; }
+        .map-label { position:absolute; font-size:10px; color:#666; font-weight:600; }
+        .truck-marker { position:absolute; font-size:28px; transition:all 2s ease-in-out; filter:drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); z-index:10; }
+        .home-marker { position:absolute; font-size:24px; z-index:10; }
+        .pulse-ring { position:absolute; border:3px solid #1a7f44; border-radius:50%; animation:pulseRing 2s ease-out infinite; z-index:5; }
+        @keyframes pulseRing { 0%{transform:scale(0.8);opacity:1;} 100%{transform:scale(2.5);opacity:0;} }
+        .status-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:600; }
+        .status-on-the-way { background:#fff3e0; color:#e65100; }
+        .status-nearby { background:#e8f5e9; color:#2e7d32; }
+        .status-arrived { background:#e3f2fd; color:#1565c0; }
+        .info-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; }
+        .info-item { background:#f9f9f9; border-radius:12px; padding:14px; text-align:center; }
+        .info-item .val { font-size:1.4rem; font-weight:700; color:#1a7f44; }
+        .info-item .lbl { font-size:11px; color:#888; margin-top:4px; }
+        .progress-bar-wrap { background:#e8f5e9; border-radius:10px; height:10px; overflow:hidden; margin:8px 0; }
+        .progress-bar-fill { background:linear-gradient(90deg,#1a7f44,#65a53b); height:100%; border-radius:10px; transition:width 1s ease; }
+        .facility-row { display:flex; justify-content:space-between; align-items:center; padding:12px; background:#f9f9f9; border-radius:10px; margin-bottom:8px; }
+        .live-dot { display:inline-block; width:8px; height:8px; background:#27ae60; border-radius:50%; margin-right:6px; animation:blink 1s infinite; }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+    </style>
 </head>
 <body>
     <nav>
@@ -19,39 +43,89 @@
         </ul>
     </nav>
 
-    <div id="map">
-        <div style="text-align:center;width:100%;">
-            <div style="font-size:60px;margin-bottom:20px;">🗺️</div>
-            <h2 style="color:#1a7f44;">Live Waste Picker Tracking</h2>
-            <p style="color:#666;margin:10px 0 25px;" id="areaLabel">Loading your area...</p>
+    <div class="container" style="max-width:860px;">
+        <h2 style="color:#1a7f44;margin-bottom:6px;">🚛 Live Waste Picker Tracking</h2>
+        <p style="color:#888;margin-bottom:20px;font-size:14px;"><span class="live-dot"></span>Real-time location updates every 30 seconds</p>
 
-            <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:30px;">
-                <div style="background:white;padding:20px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1);min-width:150px;">
-                    <div style="font-size:30px;">🚛</div>
-                    <strong style="color:#1a7f44;" id="truckNum">Loading...</strong>
-                    <p style="font-size:12px;color:#666;" id="truckEta">—</p>
+        <!-- Status Banner -->
+        <div class="tracker-card" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+                <div id="statusBadge" class="status-badge status-on-the-way">🚛 On the Way</div>
+                <p id="etaText" style="margin-top:8px;font-size:15px;color:#333;font-weight:600;">Arriving in <span id="etaMins" style="color:#1a7f44;">—</span> minutes</p>
+                <p id="areaText" style="font-size:13px;color:#888;margin-top:4px;">Area: <span id="areaName">Loading...</span></p>
+            </div>
+            <div style="text-align:right;">
+                <div style="font-size:13px;color:#888;">Truck Number</div>
+                <div id="truckNo" style="font-size:1.6rem;font-weight:700;color:#1a7f44;">—</div>
+            </div>
+        </div>
+
+        <!-- Live Map Simulation -->
+        <div class="tracker-card">
+            <h3 style="color:#1a7f44;margin-bottom:14px;">🗺️ Live Map</h3>
+            <div class="map-container" id="mapArea">
+                <!-- Roads -->
+                <div class="road-h" style="top:33%;"></div>
+                <div class="road-h" style="top:66%;"></div>
+                <div class="road-v" style="left:33%;"></div>
+                <div class="road-v" style="left:66%;"></div>
+                <!-- Labels -->
+                <div class="map-label" style="top:10px;left:10px;">🏢 Municipality</div>
+                <div class="map-label" style="top:10px;right:10px;">🏪 Market</div>
+                <div class="map-label" style="bottom:10px;left:10px;">🏫 School</div>
+                <div class="map-label" style="bottom:10px;right:10px;">🏥 Hospital</div>
+                <!-- Your Home -->
+                <div class="home-marker" id="homeMarker" style="right:22%;top:20%;">🏠</div>
+                <div class="pulse-ring" style="width:30px;height:30px;right:21%;top:19%;"></div>
+                <!-- Truck -->
+                <div class="truck-marker" id="truckMarker" style="left:5%;top:60%;">🚛</div>
+            </div>
+            <div style="display:flex;gap:16px;font-size:12px;color:#888;margin-top:8px;">
+                <span>🏠 Your location</span>
+                <span>🚛 Waste picker truck</span>
+                <span style="color:#1a7f44;">● Live pulse = your area</span>
+            </div>
+        </div>
+
+        <!-- Trip Progress -->
+        <div class="tracker-card">
+            <h3 style="color:#1a7f44;margin-bottom:12px;">📍 Trip Progress</h3>
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:#666;margin-bottom:4px;">
+                <span>Depot Start</span><span>Your Street</span><span>Your Door</span>
+            </div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="tripProgress" style="width:40%;"></div>
+            </div>
+            <div style="text-align:center;font-size:13px;color:#1a7f44;font-weight:600;" id="progressLabel">En route to your area...</div>
+        </div>
+
+        <!-- Info Grid -->
+        <div class="tracker-card">
+            <h3 style="color:#1a7f44;margin-bottom:14px;">📅 Pickup Schedule</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="val" id="schedDays">—</div>
+                    <div class="lbl">Pickup Days</div>
                 </div>
-                <div style="background:white;padding:20px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1);min-width:150px;">
-                    <div style="font-size:30px;">📍</div>
-                    <strong style="color:#1a7f44;">Your Area</strong>
-                    <p style="font-size:12px;color:#666;" id="userArea">—</p>
+                <div class="info-item">
+                    <div class="val" id="nextPickup">—</div>
+                    <div class="lbl">Next Pickup</div>
                 </div>
-                <div style="background:white;padding:20px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1);min-width:150px;">
-                    <div style="font-size:30px;">📅</div>
-                    <strong style="color:#1a7f44;">Schedule</strong>
-                    <p style="font-size:12px;color:#666;" id="scheduleDays">—</p>
+                <div class="info-item">
+                    <div class="val" id="truckEta">—</div>
+                    <div class="lbl">ETA (mins)</div>
                 </div>
-                <div style="background:white;padding:20px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,0.1);min-width:150px;">
-                    <div style="font-size:30px;">⏰</div>
-                    <strong style="color:#1a7f44;">Next Pickup</strong>
-                    <p style="font-size:12px;color:#666;" id="nextPickup">—</p>
+                <div class="info-item">
+                    <div class="val">8AM</div>
+                    <div class="lbl">Pickup Time</div>
                 </div>
             </div>
+        </div>
 
-            <div style="max-width:700px;margin:0 auto;">
-                <h3 style="color:#1a7f44;margin-bottom:15px;">🚿 Reported Facility Status</h3>
-                <div id="facilityList"><p style="color:#999;">Loading...</p></div>
-            </div>
+        <!-- Facility Status -->
+        <div class="tracker-card">
+            <h3 style="color:#1a7f44;margin-bottom:14px;">🚿 Reported Facility Status</h3>
+            <div id="facilityList"><p style="color:#999;text-align:center;">Loading...</p></div>
         </div>
     </div>
 
@@ -66,34 +140,82 @@
         }
         if (!getToken()) { window.location.href='./index.html'; }
 
+        // Truck animation waypoints across the map
+        const waypoints = [
+            {left:'5%',top:'60%'}, {left:'20%',top:'60%'}, {left:'33%',top:'60%'},
+            {left:'33%',top:'45%'}, {left:'50%',top:'33%'}, {left:'66%',top:'33%'},
+            {left:'66%',top:'20%'}, {left:'72%',top:'18%'}
+        ];
+        let wpIndex = 0;
+        const truck = document.getElementById('truckMarker');
+        const progressBar = document.getElementById('tripProgress');
+        const progressLabel = document.getElementById('progressLabel');
+        const statusBadge = document.getElementById('statusBadge');
+
+        function moveTruck() {
+            if (wpIndex < waypoints.length) {
+                const wp = waypoints[wpIndex];
+                truck.style.left = wp.left;
+                truck.style.top = wp.top;
+                const pct = Math.round((wpIndex / (waypoints.length-1)) * 100);
+                progressBar.style.width = pct + '%';
+
+                if (pct < 40) {
+                    progressLabel.textContent = 'En route to your area...';
+                    statusBadge.className = 'status-badge status-on-the-way';
+                    statusBadge.textContent = '🚛 On the Way';
+                } else if (pct < 80) {
+                    progressLabel.textContent = 'Approaching your street!';
+                    statusBadge.className = 'status-badge status-nearby';
+                    statusBadge.textContent = '📍 Nearby — Get Ready!';
+                } else {
+                    progressLabel.textContent = '🎉 Truck is almost at your door!';
+                    statusBadge.className = 'status-badge status-arrived';
+                    statusBadge.textContent = '✅ Almost Arrived!';
+                }
+                wpIndex++;
+            } else {
+                wpIndex = 0; // loop
+            }
+        }
+        setInterval(moveTruck, 4000);
+        moveTruck();
+
         async function loadSchedule() {
             try {
-                const res = await fetch(`${API}/api/schedule`,{headers:{'Authorization':'Bearer '+getToken()}});
-                if (res.status===401){window.location.href='./index.html';return;}
+                const res = await fetch(`${API}/api/schedule`, {headers:{'Authorization':'Bearer '+getToken()}});
+                if (res.status===401) { window.location.href='./index.html'; return; }
                 const data = await res.json();
 
-                document.getElementById('areaLabel').textContent = `Pickup info for: ${data.area}`;
-                document.getElementById('truckNum').textContent = `Truck #${data.truck_number}`;
-                document.getElementById('truckEta').textContent = `ETA: ${data.eta_minutes} mins`;
-                document.getElementById('userArea').textContent = data.area;
-                document.getElementById('scheduleDays').textContent = data.schedule_days.join(', ');
+                document.getElementById('areaName').textContent = data.area;
+                document.getElementById('truckNo').textContent = `#${data.truck_number}`;
+                document.getElementById('etaMins').textContent = data.eta_minutes;
+                document.getElementById('truckEta').textContent = data.eta_minutes;
+                document.getElementById('schedDays').textContent = data.schedule_days.slice(0,2).map(d=>d.substring(0,3)).join(', ');
                 document.getElementById('nextPickup').textContent = data.next_pickup;
+
+                // Update ETA countdown
+                let eta = data.eta_minutes;
+                const countdown = setInterval(() => {
+                    if (eta > 1) { eta--; document.getElementById('etaMins').textContent = eta; }
+                    else { clearInterval(countdown); document.getElementById('etaMins').textContent = 'Now!'; }
+                }, 60000);
 
                 const facilityEl = document.getElementById('facilityList');
                 if (!data.facilities || !data.facilities.length) {
-                    facilityEl.innerHTML = `<div style="padding:20px;background:white;border-radius:12px;color:#999;text-align:center;">No washroom complaints yet. Facility status will appear here once issues are reported.</div>`;
+                    facilityEl.innerHTML = `<div style="padding:16px;background:#f9f9f9;border-radius:10px;color:#999;text-align:center;">No facility reports yet. Status will appear once washroom issues are reported.</div>`;
                 } else {
                     facilityEl.innerHTML = data.facilities.map(f => `
-                        <div style="display:flex;justify-content:space-between;align-items:center;background:white;padding:15px 20px;border-radius:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-                            <div style="text-align:left;">
+                        <div class="facility-row">
+                            <div>
                                 <strong style="font-size:14px;">${f.name}</strong>
-                                <p style="font-size:12px;color:#666;margin:2px 0;">Last updated: ${f.last}</p>
+                                <p style="font-size:12px;color:#888;margin:2px 0;">Last updated: ${f.last}</p>
                             </div>
                             <span style="font-size:14px;font-weight:600;">${f.icon} ${f.status}</span>
                         </div>`).join('');
                 }
             } catch(err) {
-                document.getElementById('areaLabel').textContent = 'Unable to load schedule.';
+                document.getElementById('areaName').textContent = 'Unable to load';
             }
         }
         window.addEventListener('DOMContentLoaded', loadSchedule);

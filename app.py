@@ -26,21 +26,10 @@ except Exception as e:
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = secrets.token_hex(32)
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-# ── CORS ──
-# Handle ALL OPTIONS requests globally
-@app.before_request
-def handle_preflight():
-    if request.method == "OPTIONS":
-        response = app.make_default_options_response()
-        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
-        response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,PATCH,DELETE,OPTIONS'
-        response.headers['Access-Control-Allow-Credentials'] = 'true'
-        return response
 
+# ── CORS ──
 CORS(app, supports_credentials=True,
-     origins=["https://cleanify-frontend-eight.vercel.app",
+     origins=["https://swachtha.vercel.app",
                "http://localhost:5500", "http://127.0.0.1:5500"])
 
 @app.after_request
@@ -492,7 +481,9 @@ def classify_waste():
                 os.remove(tmp_path)
         waste_type = result['waste_type']
         confidence = result['confidence']
-        if waste_type == 'wet':
+        if waste_type == 'ewaste':
+            category, bin_color, icon = "E-Waste", "Red", "💻"
+        elif waste_type == 'wet':
             category, bin_color, icon = "Wet Waste", "Green", "🥬"
         else:
             category, bin_color, icon = "Dry Waste", "Blue", "📦"

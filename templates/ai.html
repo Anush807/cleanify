@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Waste Classifier - Cleanify</title>
-    <meta name="description" content="AI-powered waste classification - Upload an image and get instant waste type identification">
     <link rel="stylesheet" href="./static/User.css">
 </head>
-
 <body>
-
     <nav>
         <h2 data-key="title">🌿 CLEANIFY</h2>
         <ul>
@@ -37,245 +33,167 @@
 
     <div class="box">
         <h2 data-key="aiHeader">🤖 AI Waste Classifier</h2>
-        <p style="text-align: center; color: #666; margin-bottom: 25px;" data-key="aiSubtitle">
-            Upload an image of waste — our AI will classify it as <strong>Dry</strong> or <strong>Wet</strong> waste instantly!
+        <p style="text-align:center;color:#666;margin-bottom:25px;" data-key="aiSubtitle">
+            Upload an image — AI classifies it as <strong>Dry</strong>, <strong>Wet</strong>, or <strong>E-Waste</strong> instantly!
         </p>
 
-        <!-- Auth check notice -->
         <div id="authNotice" style="display:none;text-align:center;padding:15px;background:#fff3cd;border-radius:10px;margin-bottom:20px;">
             ⚠️ Please <a href="./index.html" style="color:#1a7f44;font-weight:600;">sign in</a> to use the AI classifier.
         </div>
 
-        <div id="uploadArea"
-            style="border: 3px dashed #1a7f44; border-radius: 16px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.3s; background: rgba(26, 127, 68, 0.05);">
-            <div style="font-size: 50px; margin-bottom: 15px;">📷</div>
-            <p style="color: #666;" data-key="dropText">Drag & drop an image or click to upload</p>
-            <input type="file" id="wasteImg" accept="image/*" style="display: none;" />
+        <div id="uploadArea" style="border:3px dashed #1a7f44;border-radius:16px;padding:40px;text-align:center;cursor:pointer;transition:all 0.3s;background:rgba(26,127,68,0.05);">
+            <div style="font-size:50px;margin-bottom:15px;">📷</div>
+            <p style="color:#666;" data-key="dropText">Drag & drop an image or click to upload</p>
+            <input type="file" id="wasteImg" accept="image/*" style="display:none;" />
         </div>
 
-        <div id="imagePreview" style="display: none; margin-top: 20px; text-align: center;">
-            <img id="previewImg"
-                style="max-width: 100%; max-height: 300px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15);" />
+        <div id="imagePreview" style="display:none;margin-top:20px;text-align:center;">
+            <img id="previewImg" style="max-width:100%;max-height:300px;border-radius:12px;box-shadow:0 8px 25px rgba(0,0,0,0.15);" />
             <br>
             <button onclick="resetUpload()" style="margin-top:10px;padding:8px 18px;background:#eee;border:none;border-radius:8px;cursor:pointer;font-size:13px;">🔄 Change Image</button>
         </div>
 
-        <button onclick="classifyWaste()" id="classifyBtn" style="display: none;" data-key="classifyBtn">🔍 Classify Waste</button>
+        <button onclick="classifyWaste()" id="classifyBtn" style="display:none;" data-key="classifyBtn">🔍 Classify Waste</button>
+        <div id="result" style="margin-top:25px;padding:20px;border-radius:12px;display:none;"></div>
 
-        <div id="result" style="margin-top: 25px; padding: 20px; border-radius: 12px; display: none;"></div>
-
-        <!-- Waste Guide -->
-        <div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #f0f9f0, #e8ffe8); border-radius: 12px;">
-            <h3 style="color: #1a7f44; margin-bottom: 15px;" data-key="guideTitle">♻️ Waste Classification Guide</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
-                <div style="text-align: center; padding: 15px; background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                    <div style="font-size: 30px;">🥬</div>
-                    <strong style="color: #1a7f44;">Wet Waste</strong>
-                    <p style="font-size: 12px; color: #666; margin-top: 5px;">Food scraps, leaves, peels</p>
+        <!-- Waste Guide — now 3 categories -->
+        <div style="margin-top:30px;padding:20px;background:linear-gradient(135deg,#f0f9f0,#e8ffe8);border-radius:12px;">
+            <h3 style="color:#1a7f44;margin-bottom:15px;" data-key="guideTitle">♻️ Waste Classification Guide</h3>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:15px;">
+                <div style="text-align:center;padding:15px;background:white;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+                    <div style="font-size:30px;">🥬</div>
+                    <strong style="color:#1a7f44;">Wet Waste</strong>
+                    <p style="font-size:12px;color:#666;margin-top:5px;">Food scraps, leaves, peels</p>
                     <span style="font-size:11px;background:#c8f0c8;padding:3px 8px;border-radius:10px;">🟢 Green Bin</span>
                 </div>
-                <div style="text-align: center; padding: 15px; background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                    <div style="font-size: 30px;">📦</div>
-                    <strong style="color: #1a7f44;">Dry Waste</strong>
-                    <p style="font-size: 12px; color: #666; margin-top: 5px;">Paper, plastic, glass, metal</p>
+                <div style="text-align:center;padding:15px;background:white;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+                    <div style="font-size:30px;">📦</div>
+                    <strong style="color:#1a7f44;">Dry Waste</strong>
+                    <p style="font-size:12px;color:#666;margin-top:5px;">Paper, plastic, glass, metal</p>
                     <span style="font-size:11px;background:#cce5ff;padding:3px 8px;border-radius:10px;">🔵 Blue Bin</span>
+                </div>
+                <div style="text-align:center;padding:15px;background:white;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+                    <div style="font-size:30px;">💻</div>
+                    <strong style="color:#e74c3c;">E-Waste</strong>
+                    <p style="font-size:12px;color:#666;margin-top:5px;">Phones, laptops, batteries, cables</p>
+                    <span style="font-size:11px;background:#ffd5d5;padding:3px 8px;border-radius:10px;">🔴 Red Bin / E-Centre</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <footer>
-        <p>© 2026 Swachhta Platform | Built for a Clean India 🇮🇳</p>
-    </footer>
+    <footer><p>© 2026 Swachhta Platform | Built for a Clean India 🇮🇳</p></footer>
 
     <script>
-        const API = 'https://cleanify-6yh1.onrender.com';  // same origin
-
-        // ── Auth ──
+        const API = 'https://cleanify-6yh1.onrender.com';
         function getToken() { return localStorage.getItem('cleanify_token'); }
         function logout() {
-            fetch(`${API}/api/auth/logout`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + getToken() } });
-            localStorage.removeItem('cleanify_token');
-            localStorage.removeItem('cleanify_role');
+            fetch(`${API}/api/auth/logout`,{method:'POST',headers:{'Authorization':'Bearer '+getToken()}});
+            localStorage.removeItem('cleanify_token'); localStorage.removeItem('cleanify_role');
             window.location.href = './index.html';
         }
-
-        // Check auth on load
         window.addEventListener('DOMContentLoaded', () => {
             if (!getToken()) {
                 document.getElementById('authNotice').style.display = 'block';
                 document.getElementById('uploadArea').style.opacity = '0.5';
                 document.getElementById('uploadArea').style.pointerEvents = 'none';
             }
-            const savedLang = localStorage.getItem('preferredLanguage');
-            if (savedLang && savedLang !== 'en') {
-                document.getElementById('languageSwitcher').value = savedLang;
-                changeLanguage();
-            }
+            const saved = localStorage.getItem('preferredLanguage');
+            if (saved && saved !== 'en') { document.getElementById('languageSwitcher').value = saved; changeLanguage(); }
         });
 
-        // ── Upload area ──
         const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('wasteImg');
-        const imagePreview = document.getElementById('imagePreview');
-        const previewImg = document.getElementById('previewImg');
-        const classifyBtn = document.getElementById('classifyBtn');
-
-        uploadArea.addEventListener('click', () => fileInput.click());
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#256410';
-            uploadArea.style.background = 'rgba(26, 127, 68, 0.1)';
-        });
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.style.borderColor = '#1a7f44';
-            uploadArea.style.background = 'rgba(26, 127, 68, 0.05)';
-        });
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#1a7f44';
-            uploadArea.style.background = 'rgba(26, 127, 68, 0.05)';
-            if (e.dataTransfer.files.length) {
-                fileInput.files = e.dataTransfer.files;
-                handleFileSelect();
-            }
-        });
+        const fileInput  = document.getElementById('wasteImg');
+        uploadArea.addEventListener('click', ()=>fileInput.click());
+        uploadArea.addEventListener('dragover', e=>{e.preventDefault();uploadArea.style.borderColor='#256410';});
+        uploadArea.addEventListener('dragleave', ()=>{uploadArea.style.borderColor='#1a7f44';});
+        uploadArea.addEventListener('drop', e=>{e.preventDefault();if(e.dataTransfer.files.length){fileInput.files=e.dataTransfer.files;handleFileSelect();}});
         fileInput.addEventListener('change', handleFileSelect);
 
         function handleFileSelect() {
             const file = fileInput.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    previewImg.src = e.target.result;
-                    imagePreview.style.display = 'block';
-                    classifyBtn.style.display = 'block';
-                    uploadArea.style.display = 'none';
-                    document.getElementById('result').style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            }
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+                document.getElementById('classifyBtn').style.display = 'block';
+                document.getElementById('uploadArea').style.display = 'none';
+                document.getElementById('result').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
         }
 
         function resetUpload() {
-            uploadArea.style.display = 'block';
-            imagePreview.style.display = 'none';
-            classifyBtn.style.display = 'none';
+            document.getElementById('uploadArea').style.display = 'block';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('classifyBtn').style.display = 'none';
             document.getElementById('result').style.display = 'none';
             fileInput.value = '';
         }
 
         async function classifyWaste() {
-            if (!getToken()) {
-                alert('Please sign in first to use the AI classifier.');
-                window.location.href = './index.html';
-                return;
-            }
-
-            const resultDiv = document.getElementById("result");
+            if (!getToken()) { alert('Please sign in first.'); window.location.href='./index.html'; return; }
+            const resultDiv = document.getElementById('result');
+            const classifyBtn = document.getElementById('classifyBtn');
             resultDiv.style.display = 'block';
-            resultDiv.style.background = 'linear-gradient(135deg, #fff9e6, #fff3cc)';
-            resultDiv.innerHTML = `
-                <div style="text-align: center;">
-                    <div style="font-size: 40px; animation: pulse 1s infinite;">🔍</div>
-                    <p style="color:#666;margin-top:10px;">Analyzing waste with AI...</p>
-                </div>`;
-            classifyBtn.disabled = true;
-            classifyBtn.textContent = '⏳ Analyzing...';
+            resultDiv.style.background = 'linear-gradient(135deg,#fff9e6,#fff3cc)';
+            resultDiv.innerHTML = `<div style="text-align:center;"><div style="font-size:40px;animation:pulse 1s infinite;">🔍</div><p style="color:#666;margin-top:10px;">Analyzing waste with AI...</p></div>`;
+            classifyBtn.disabled = true; classifyBtn.textContent = '⏳ Analyzing...';
 
             try {
-                const response = await fetch(`${API}/api/classify`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + getToken()
-                    },
-                    body: JSON.stringify({ image: previewImg.src })
+                const res = await fetch(`${API}/api/classify`, {
+                    method:'POST',
+                    headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},
+                    body: JSON.stringify({ image: document.getElementById('previewImg').src })
                 });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Classification failed');
 
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || 'Classification failed');
+                // Color & style based on type
+                let color, bgGrad, binLabel, icon;
+                if (data.category === 'Wet Waste') {
+                    color='#27ae60'; bgGrad='linear-gradient(135deg,#e8ffe8,#c8f0c8)'; binLabel='GREEN Bin'; icon='🥬';
+                } else if (data.category === 'E-Waste' || data.waste_type === 'ewaste') {
+                    color='#e74c3c'; bgGrad='linear-gradient(135deg,#fff0f0,#ffd5d5)'; binLabel='RED Bin / E-Centre'; icon='💻';
+                    data.category = 'E-Waste';
+                } else {
+                    color='#3498db'; bgGrad='linear-gradient(135deg,#e8f4fd,#cce5ff)'; binLabel='BLUE Bin'; icon='📦';
                 }
 
-                const isDry = data.category === 'Dry Waste';
-                const color = isDry ? '#3498db' : '#27ae60';
-                const binColor = isDry ? '#3498db' : '#27ae60';
-                const bgGradient = isDry
-                    ? 'linear-gradient(135deg, #e8f4fd, #cce5ff)'
-                    : 'linear-gradient(135deg, #e8ffe8, #c8f0c8)';
-
-                resultDiv.style.background = bgGradient;
+                resultDiv.style.background = bgGrad;
                 resultDiv.innerHTML = `
-                    <div style="text-align: center;">
-                        <div style="font-size: 70px; margin-bottom: 15px;">${data.icon}</div>
-                        <h3 style="color: ${color}; font-size: 1.8rem; margin-bottom: 8px;">${data.category}</h3>
-                        <div style="display:inline-block;padding:5px 16px;background:${binColor};color:white;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:15px;">
-                            🗑️ Use ${data.bin_color} Bin
+                    <div style="text-align:center;">
+                        <div style="font-size:70px;margin-bottom:15px;">${icon}</div>
+                        <h3 style="color:${color};font-size:1.8rem;margin-bottom:8px;">${data.category}</h3>
+                        <div style="display:inline-block;padding:5px 16px;background:${color};color:white;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:15px;">
+                            🗑️ Use ${binLabel}
                         </div>
                         <p style="color:#555;font-size:13px;margin:8px 0;"><strong>Confidence:</strong> ${data.confidence}%</p>
                         <div style="margin-top:15px;padding:15px;background:rgba(26,127,68,0.08);border-radius:10px;text-align:left;">
                             <strong style="color:#1a7f44;">🎯 How to Dispose:</strong>
                             <p style="font-size:14px;margin-top:6px;color:#444;">${data.disposal_tip}</p>
                         </div>
-                        ${data.waste_examples ? `
-                        <div style="margin-top:10px;padding:12px;background:rgba(0,0,0,0.04);border-radius:10px;text-align:left;">
-                            <strong style="color:#555;font-size:13px;">📋 Examples:</strong>
-                            <p style="font-size:13px;margin-top:5px;color:#666;">${data.waste_examples}</p>
-                        </div>` : ''}
+                        ${data.waste_examples ? `<div style="margin-top:10px;padding:12px;background:rgba(0,0,0,0.04);border-radius:10px;text-align:left;"><strong style="color:#555;font-size:13px;">📋 Examples:</strong><p style="font-size:13px;margin-top:5px;color:#666;">${data.waste_examples}</p></div>` : ''}
+                        ${data.category === 'E-Waste' ? `<div style="margin-top:12px;padding:10px;background:#fff3cd;border-radius:8px;font-size:13px;color:#856404;"><strong>⚠️ E-Waste Warning:</strong> Never throw in regular bins! Take to nearest e-waste collection centre or contact your municipality.</div>` : ''}
                         ${data.points_awarded ? `<div style="margin-top:12px;padding:8px;background:rgba(26,127,68,0.15);border-radius:8px;font-size:13px;color:#1a7f44;font-weight:600;">✨ +${data.points_awarded} Green Points Earned!</div>` : ''}
-                    </div>
-                `;
-            } catch (err) {
-                resultDiv.style.background = 'linear-gradient(135deg, #fff0f0, #ffe0e0)';
+                    </div>`;
+            } catch(err) {
+                resultDiv.style.background = 'linear-gradient(135deg,#fff0f0,#ffe0e0)';
                 resultDiv.innerHTML = `<div style="text-align:center;color:#e74c3c;"><div style="font-size:40px;">⚠️</div><p>${err.message}</p></div>`;
             } finally {
-                classifyBtn.disabled = false;
-                classifyBtn.textContent = '🔍 Classify Waste';
+                classifyBtn.disabled = false; classifyBtn.textContent = '🔍 Classify Waste';
             }
         }
 
-        // Translation system
-        const translations = {
-            en: {
-                title: "🌿 CLEANIFY",
-                home: "Home", report: "Report Issue", ai: "AI Classifier",
-                eco: "Eco Store", reward: "Rewards",
-                aiHeader: "🤖 AI Waste Classifier",
-                aiSubtitle: "Upload an image of waste — our AI will classify it as Dry or Wet waste instantly!",
-                dropText: "Drag & drop an image or click to upload",
-                classifyBtn: "🔍 Classify Waste",
-                guideTitle: "♻️ Waste Classification Guide"
-            }
-        };
-        const translationCache = {};
-        async function fetchTranslation(text, targetLang) {
-            if (targetLang === "en") return text;
-            const cacheKey = text + "|" + targetLang;
-            if (translationCache[cacheKey]) return translationCache[cacheKey];
-            try {
-                const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${targetLang}`;
-                const res = await fetch(url);
-                const data = await res.json();
-                return translationCache[cacheKey] = data.responseData.translatedText;
-            } catch { return text; }
-        }
-        async function changeLanguage() {
-            const lang = document.getElementById("languageSwitcher").value;
-            localStorage.setItem('preferredLanguage', lang);
-            for (let el of document.querySelectorAll("[data-key]")) {
-                const key = el.getAttribute("data-key");
-                const orig = translations.en[key];
-                if (!orig) continue;
-                el.textContent = lang === "en" ? orig : await fetchTranslation(orig, lang);
-            }
-        }
+        const T = { en:{ title:'🌿 CLEANIFY', home:'Home', report:'Report Issue', ai:'AI Classifier', eco:'Eco Store', reward:'Rewards',
+                         aiHeader:'🤖 AI Waste Classifier', aiSubtitle:'Upload an image — AI classifies it as Dry, Wet, or E-Waste instantly!',
+                         dropText:'Drag & drop an image or click to upload', classifyBtn:'🔍 Classify Waste',
+                         guideTitle:'♻️ Waste Classification Guide' }};
+        const cache = {};
+        async function fetchT(text,lang){if(lang==='en')return text;const k=text+'|'+lang;if(cache[k])return cache[k];try{const r=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${lang}`);const d=await r.json();return cache[k]=d.responseData.translatedText;}catch{return text;}}
+        async function changeLanguage(){const lang=document.getElementById('languageSwitcher').value;localStorage.setItem('preferredLanguage',lang);for(const el of document.querySelectorAll('[data-key]')){const orig=T.en[el.getAttribute('data-key')];if(!orig)continue;el.textContent=lang==='en'?orig:await fetchT(orig,lang);}}
     </script>
-
-    <style>
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-    </style>
-
+    <style>@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}</style>
 </body>
 </html>

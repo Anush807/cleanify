@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLEANIFY - Clean India, Green India</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green-deep: #0a2e1a;
+            --green-mid: #1a7f44;
+            --green-bright: #4caf50;
+            --green-light: #a8e6b0;
+            --gold: #c9a84c;
+            --white: #f5f9f5;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--green-deep);
+            color: var(--white);
+            overflow-x: hidden;
+        }
+
+        /* ── VIDEO HERO ── */
+        .hero {
+            position: relative;
+            height: 100vh;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Video background — swap src to New.mp4 when available */
+        .hero-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.35;
+            z-index: 0;
+        }
+
+        /* Animated gradient placeholder — shown until real video is added */
+        .hero-bg-placeholder {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 40%, rgba(76,175,80,0.45) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 70%, rgba(0,200,100,0.35) 0%, transparent 60%),
+                radial-gradient(ellipse 100% 50% at 50% 10%, rgba(26,127,68,0.3) 0%, transparent 70%),
+                linear-gradient(160deg, #071a0d 0%, #0f3320 40%, #0a2e1a 100%);
+            animation: bgPulse 8s ease-in-out infinite alternate;
+        }
+
+        /* Animated nature particles */
+        .particles { position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+        .leaf { position:absolute; font-size:clamp(16px,2vw,28px); opacity:0; animation: fallLeaf linear infinite; }
+
+        @keyframes bgPulse {
+            0%  { filter: hue-rotate(0deg) brightness(1); }
+            100%{ filter: hue-rotate(15deg) brightness(1.15); }
+        }
+        @keyframes fallLeaf {
+            0%  { transform: translateY(-60px) rotate(0deg) translateX(0); opacity:0; }
+            10% { opacity:0.6; }
+            90% { opacity:0.4; }
+            100%{ transform: translateY(110vh) rotate(360deg) translateX(80px); opacity:0; }
+        }
+
+        /* Overlay gradient */
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom,
+                rgba(7,26,13,0.2) 0%,
+                rgba(7,26,13,0.15) 40%,
+                rgba(7,26,13,0.85) 100%);
+            z-index: 2;
+        }
+
+        /* Hero content */
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            text-align: center;
+            padding: 0 24px;
+            max-width: 900px;
+            animation: heroReveal 1.2s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        @keyframes heroReveal {
+            from { opacity:0; transform: translateY(40px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(76,175,80,0.15);
+            border: 1px solid rgba(76,175,80,0.4);
+            backdrop-filter: blur(8px);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--green-light);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+            animation: heroReveal 1.2s 0.2s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.8rem, 7vw, 5.5rem);
+            font-weight: 900;
+            line-height: 1.05;
+            color: #fff;
+            margin-bottom: 20px;
+            animation: heroReveal 1.2s 0.35s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        .hero-title .accent {
+            color: var(--green-bright);
+            position: relative;
+        }
+        .hero-title .accent::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--green-bright), var(--gold));
+            border-radius: 2px;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.2vw, 1.25rem);
+            color: rgba(255,255,255,0.75);
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            font-weight: 300;
+            animation: heroReveal 1.2s 0.5s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: heroReveal 1.2s 0.65s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 36px;
+            background: linear-gradient(135deg, var(--green-mid), #256410);
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(26,127,68,0.5);
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(26,127,68,0.6); }
+        .btn-primary:hover::before { opacity: 1; }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 36px;
+            background: rgba(255,255,255,0.08);
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.25);
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.14); transform: translateY(-3px); }
+
+        /* Scroll indicator */
+        .scroll-hint {
+            position: absolute;
+            bottom: 36px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: fadeInUp 1s 1.2s both;
+        }
+        .scroll-hint .arrow { animation: bounceDown 1.5s ease-in-out infinite; }
+        @keyframes bounceDown { 0%,100%{transform:translateY(0);} 50%{transform:translateY(8px);} }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);} }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.4s ease;
+        }
+        nav.scrolled {
+            background: rgba(10,46,26,0.92);
+            backdrop-filter: blur(16px);
+            padding: 14px 40px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+        }
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-actions { display: flex; gap: 12px; align-items: center; }
+
+        /* ── FEATURES SECTION ── */
+        .features {
+            padding: 100px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--green-bright);
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            color: white;
+            margin-bottom: 60px;
+            line-height: 1.2;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .feature-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 32px;
+            transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--green-bright), var(--gold));
+            transform: scaleX(0);
+            transition: transform 0.35s ease;
+        }
+        .feature-card:hover { background: rgba(76,175,80,0.08); border-color: rgba(76,175,80,0.3); transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .feature-card:hover::before { transform: scaleX(1); }
+        .feature-icon { font-size: 2.5rem; margin-bottom: 18px; display: block; }
+        .feature-card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; color: white; }
+        .feature-card p { font-size: 0.9rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
+        .feature-arrow { position:absolute; bottom:24px; right:24px; font-size:18px; opacity:0; transition:all 0.3s; transform:translateX(-8px); }
+        .feature-card:hover .feature-arrow { opacity:1; transform:translateX(0); }
+
+        /* ── STATS STRIP ── */
+        .stats-strip {
+            background: linear-gradient(135deg, rgba(26,127,68,0.2), rgba(76,175,80,0.1));
+            border-top: 1px solid rgba(76,175,80,0.15);
+            border-bottom: 1px solid rgba(76,175,80,0.15);
+            padding: 60px 40px;
+        }
+        .stats-inner { max-width:1000px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:40px; text-align:center; }
+        .stat-num { font-family:'Playfair Display',serif; font-size:3rem; font-weight:700; color:var(--green-bright); line-height:1; }
+        .stat-lbl { font-size:13px; color:rgba(255,255,255,0.6); margin-top:8px; letter-spacing:0.5px; }
+
+        /* ── FOOTER ── */
+        footer { text-align:center; padding:40px; font-size:13px; color:rgba(255,255,255,0.4); border-top:1px solid rgba(255,255,255,0.06); }
+
+        /* ── VIDEO PLACEHOLDER notice ── */
+        .video-notice {
+            position: absolute;
+            bottom: 80px;
+            right: 24px;
+            z-index: 4;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            max-width: 220px;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            nav { padding: 16px 20px; }
+            .features { padding: 60px 20px; }
+            .hero-title { font-size: 2.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── FIXED NAV ── -->
+    <nav id="mainNav">
+        <a href="#" class="nav-logo">🌿 CLEANIFY</a>
+        <div class="nav-actions">
+            <a href="./index.html" class="btn-secondary" style="padding:10px 24px;font-size:14px;">Sign In</a>
+            <a href="./reg.html" class="btn-primary" style="padding:10px 24px;font-size:14px;">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- ── HERO SECTION WITH VIDEO PLACEHOLDER ── -->
+    <section class="hero">
+
+        <!-- VIDEO BACKGROUND -->
+        <video class="hero-video" autoplay muted loop playsinline id="heroBg">
+            <source src="./New.mp4" type="video/mp4">
+        </video>
+        <!-- Fallback gradient shown if video fails to load -->
+        <div class="hero-bg-placeholder" id="heroBgFallback"></div>
+
+        <!-- Falling leaf particles -->
+        <div class="particles" id="particles"></div>
+
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+            <div class="hero-badge">
+                🇮🇳 Swachh Bharat Initiative
+            </div>
+            <h1 class="hero-title">
+                Clean India,<br>
+                <span class="accent">Green India</span>
+            </h1>
+            <p class="hero-subtitle">
+                Together we can build a cleaner, greener future for generations to come.
+                Report issues, classify waste with AI, and earn rewards for every action.
+            </p>
+            <div class="hero-cta">
+                <a href="./report.html" class="btn-primary">📋 Report an Issue</a>
+                <a href="./reg.html" class="btn-secondary">🌿 Join the Movement</a>
+            </div>
+        </div>
+
+
+
+        <div class="scroll-hint">
+            <span>Scroll</span>
+            <span class="arrow">↓</span>
+        </div>
+    </section>
+
+    <!-- ── STATS ── -->
+    <div class="stats-strip">
+        <div class="stats-inner">
+            <div><div class="stat-num" id="s1">0</div><div class="stat-lbl">Issues Reported</div></div>
+            <div><div class="stat-num" id="s2">0</div><div class="stat-lbl">Complaints Resolved</div></div>
+            <div><div class="stat-num" id="s3">0</div><div class="stat-lbl">Green Points Awarded</div></div>
+            <div><div class="stat-num" id="s4">0</div><div class="stat-lbl">Active Citizens</div></div>
+        </div>
+    </div>
+
+    <!-- ── FEATURES ── -->
+    <section class="features">
+        <div class="section-label">What You Can Do</div>
+        <h2 class="section-title">Everything you need<br>for a cleaner city</h2>
+        <div class="features-grid">
+            <a href="./report.html" class="feature-card">
+                <span class="feature-icon">🚛</span>
+                <h3>Report Waste Dumping</h3>
+                <p>Instantly report high dumping areas with photos & GPS location. Authorities are notified immediately.</p>
+                <span class="feature-arrow">→</span>
+            </a>
+            <a href="./washroom.html" class="feature-card">
+                <span class="feature-icon">🚿</span>
+                <h3>Unclean Washrooms</h3>
+                <p>Flag dirty public washrooms with a single click. Track resolution status in real time.</p>
+                <span class="feature-arrow">→</span>
+            </a>
+            <a href="./ai.html" class="feature-card">
+                <span class="feature-icon">🤖</span>
+                <h3>AI Waste Classifier</h3>
+                <p>Upload a photo — AI instantly classifies waste as Dry, Wet, or E-Waste and tells you the right bin.</p>
+                <span class="feature-arrow">→</span>
+            </a>
+            <a href="./eco.html" class="feature-card">
+                <span class="feature-icon">🛒</span>
+                <h3>Eco-Friendly Store</h3>
+                <p>Buy sustainable products like paper bags, compost bins, and jute bags. Earn green points on every purchase.</p>
+                <span class="feature-arrow">→</span>
+            </a>
+            <a href="./waste.html" class="feature-card">
+                <span class="feature-icon">📍</span>
+                <h3>Track Waste Pickers</h3>
+                <p>Live GPS tracking — know exactly when the waste truck will reach your street. Never miss a pickup.</p>
+                <span class="feature-arrow">→</span>
+            </a>
+            <a href="./reward.html" class="feature-card">
+                <span class="feature-icon">🏆</span>
+                <h3>Rewards & Badges</h3>
+                <p>Earn points for every complaint, clean action, and eco-purchase. Level up and unlock exclusive badges.</p>
+                <span class="feature-arrow">→</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- ── FOOTER ── -->
+    <footer>
+        <p style="font-size:1.5rem;margin-bottom:12px;">🌿</p>
+        <p>© 2026 Swachhta Platform | Built for a Clean India 🇮🇳</p>
+        <p style="margin-top:8px;"><a href="./index.html" style="color:var(--green-bright);text-decoration:none;">Sign In</a> · <a href="./reg.html" style="color:var(--green-bright);text-decoration:none;">Register</a></p>
+    </footer>
+
+    <script>
+        // ── Video background handling ──
+        const vid = document.getElementById('heroBg');
+        const fallback = document.getElementById('heroBgFallback');
+        if (vid) {
+            vid.addEventListener('canplay', () => {
+                fallback.style.display = 'none';
+                vid.style.opacity = '0.38';
+            });
+            vid.addEventListener('error', () => {
+                vid.style.display = 'none';
+                fallback.style.display = 'block';
+            });
+            // If video not playing after 3s show fallback
+            setTimeout(() => {
+                if (vid.readyState < 3) {
+                    vid.style.display = 'none';
+                    fallback.style.display = 'block';
+                }
+            }, 3000);
+        }
+
+        // ── Nav scroll effect ──
+        window.addEventListener('scroll', () => {
+            document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 60);
+        });
+
+        // ── Leaf particle generator ──
+        const emojis = ['🍃','🌿','🍀','🌱','🌾','🍂'];
+        const container = document.getElementById('particles');
+        for (let i = 0; i < 18; i++) {
+            const leaf = document.createElement('div');
+            leaf.className = 'leaf';
+            leaf.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            leaf.style.left = Math.random() * 100 + 'vw';
+            leaf.style.animationDuration = (8 + Math.random() * 12) + 's';
+            leaf.style.animationDelay = (Math.random() * 12) + 's';
+            leaf.style.fontSize = (14 + Math.random() * 20) + 'px';
+            container.appendChild(leaf);
+        }
+
+        // ── Animated counters ──
+        const targets = { s1: 1240, s2: 870, s3: 52000, s4: 3800 };
+        function animateCount(id, target) {
+            let start = 0;
+            const step = target / 60;
+            const el = document.getElementById(id);
+            const timer = setInterval(() => {
+                start = Math.min(start + step, target);
+                el.textContent = (start >= 1000)
+                    ? (start >= 10000 ? Math.floor(start/1000) + 'K+' : Math.floor(start).toLocaleString())
+                    : Math.floor(start);
+                if (start >= target) clearInterval(timer);
+            }, 25);
+        }
+        const observer = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) {
+                Object.entries(targets).forEach(([id, val]) => animateCount(id, val));
+                observer.disconnect();
+            }
+        }, { threshold: 0.3 });
+        observer.observe(document.querySelector('.stats-strip'));
+    </script>
+</body>
+</html>
