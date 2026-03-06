@@ -1,16 +1,16 @@
-# 🌿 CLEANIFY — Full Stack Backend
+# 🌿 Swachtha — Full Stack Backend
 
-A complete Flask backend for the Cleanify civic cleanliness portal with AI-powered waste classification.
+A complete Flask backend for the Swachtha civic cleanliness portal with AI-powered waste classification.
 
 ---
 
 ## 🏗️ Project Structure
 
 ```
-cleanify/
+Swachtha/
 ├── app.py                  ← Main Flask server
 ├── requirements.txt
-├── cleanify.db             ← Auto-created SQLite database
+├── Swachtha.db             ← Auto-created SQLite database
 ├── static/
 │   └── styles.css
 └── templates/

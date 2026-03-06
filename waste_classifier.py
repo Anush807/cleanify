@@ -19,46 +19,51 @@ class WasteClassifier:
             mime_type = {".jpg":"image/jpeg",".jpeg":"image/jpeg",
                          ".png":"image/png",".webp":"image/webp"}.get(ext,"image/jpeg")
 
-            prompt = """You are an expert waste classification system for India's Swachh Bharat Mission.
+            prompt = """You are a waste classification expert. Look at this image carefully and classify the waste.
 
-STEP 1 - First check: Is this ANY kind of electronic or electrical item?
-Electronic/E-Waste includes ANY of these:
-- Mobile phones, smartphones, feature phones (even broken/old ones)
-- Laptops, computers, tablets, iPads
-- Chargers, cables, USB wires, power adapters
-- Batteries (any type: AA, AAA, phone battery, car battery)
-- Circuit boards, motherboards, chips
-- TVs, monitors, screens
-- Keyboards, mice, headphones, earphones
-- Cameras, printers, scanners
-- Routers, modems, remotes
-- Refrigerators, washing machines, fans, ACs (home appliances)
-- Light bulbs, tube lights, CFLs, LEDs
-- Any device that uses electricity or has a battery
-IF YES → waste_type MUST be "ewaste"
+CATEGORY DEFINITIONS:
 
-STEP 2 - If NOT electronic:
-- "wet" = food waste, fruit/vegetable peels, cooked food, garden waste, leaves, meat, dairy
-- "dry" = plastic bags, bottles, paper, cardboard, glass, metal cans, rubber, fabric, styrofoam
+"wet" — Organic/Biodegradable waste:
+- Fruit scraps, fruit peels, apple cores, grape stems, berries
+- Vegetable peels and cuttings, leafy greens, herbs
+- Cooked food leftovers, rice, bread, meat, fish, bones
+- Eggshells, tea bags, coffee grounds
+- Garden waste, dry leaves, flowers, plants
+- ANY food item or food waste
 
-CRITICAL RULES:
-- A phone/mobile = ALWAYS ewaste, never dry
-- A charger/cable = ALWAYS ewaste, never dry  
-- Any battery = ALWAYS ewaste, never dry
-- Any screen/monitor = ALWAYS ewaste, never dry
-- When in doubt between dry and ewaste → choose ewaste
+"dry" — Recyclable/Non-biodegradable waste:
+- Plastic bottles, bags, containers, wrappers
+- Paper, newspapers, cardboard boxes
+- Glass bottles, metal cans, tins
+- Cloth, rubber, wood (non-food items)
 
-Respond ONLY in this exact JSON format, no markdown, no extra text:
-{"waste_type":"ewaste","confidence":95,"detected_items":"old mobile phone","disposal_tip":"Drop at e-waste centre"}"""
+"ewaste" — Electronic waste:
+- Mobile phones, laptops, tablets
+- Chargers, cables, batteries
+- Circuit boards, bulbs, appliances
+- Any electronic device or component
+
+RULES:
+- Fruit and vegetable waste = ALWAYS "wet"
+- Food scraps of any kind = ALWAYS "wet"
+- Electronics of any kind = ALWAYS "ewaste"
+- If multiple categories, pick the most hazardous (ewaste > wet > dry)
+
+Respond ONLY with valid JSON, no markdown:
+{"waste_type":"wet","confidence":95,"detected_items":"fruit and vegetable scraps","disposal_tip":"Compost or dispose in green bin"}"""
 
             payload = json.dumps({
                 "contents": [{"parts": [
                     {"inline_data": {"mime_type": mime_type, "data": image_data}},
                     {"text": prompt}
                 ]}],
-                "generationConfig": {"temperature": 0.0, "maxOutputTokens": 120}
+                "generationConfig": {
+                    "temperature": 0.0,
+                    "maxOutputTokens": 150
+                }
             }).encode("utf-8")
 
+            # Use gemini-2.5-flash — best vision model
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={self.api_key}"
             req = urllib.request.Request(url, data=payload,
                                          headers={"Content-Type": "application/json"}, method="POST")
@@ -69,28 +74,17 @@ Respond ONLY in this exact JSON format, no markdown, no extra text:
             raw = result["candidates"][0]["content"]["parts"][0]["text"].strip()
             logging.info(f"Gemini raw response: {raw}")
 
-            # Strip markdown fences if present
+            # Clean markdown fences
             if "```" in raw:
-                for part in raw.split("```"):
-                    part = part.strip()
-                    if part.lower().startswith("json"):
-                        part = part[4:].strip()
-                    if part.startswith("{"):
-                        raw = part
-                        break
+                match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", raw, re.DOTALL)
+                if match:
+                    raw = match.group(1)
 
             # Extract JSON object
             start = raw.find("{")
             end = raw.rfind("}") + 1
             if start != -1 and end > start:
                 raw = raw[start:end]
-            else:
-                # Fallback: extract waste_type from raw text
-                wt_match = re.search(r'"waste_type"\s*:\s*"(\w+)"', raw)
-                conf_match = re.search(r'"confidence"\s*:\s*(\d+)', raw)
-                wt = wt_match.group(1).lower() if wt_match else "dry"
-                conf = float(conf_match.group(1)) if conf_match else 80.0
-                return self._build_result(wt, conf, "waste material", "")
 
             parsed   = json.loads(raw)
             wt       = parsed.get("waste_type", "dry").lower().strip()
@@ -98,15 +92,26 @@ Respond ONLY in this exact JSON format, no markdown, no extra text:
             detected = parsed.get("detected_items", "waste material")
             tip      = parsed.get("disposal_tip", "")
 
-            # Extra safety: keyword-based override
+            # Keyword safety overrides
             detected_lower = detected.lower()
-            ewaste_keywords = ["phone","mobile","charger","cable","laptop","computer","battery",
-                               "tablet","keyboard","mouse","screen","monitor","circuit","wire",
-                               "adapter","earphone","headphone","camera","printer","router",
-                               "tv","television","bulb","led","appliance","electronic","device"]
+            wet_keywords = ["fruit","vegetable","food","peel","scrap","organic",
+                            "apple","banana","grape","berry","mango","onion","carrot",
+                            "leaf","leaves","flower","herb","cooked","rice","bread",
+                            "meat","fish","egg","coffee","tea","compost"]
+            ewaste_keywords = ["phone","mobile","laptop","charger","cable","battery",
+                               "circuit","electronic","device","screen","bulb","led",
+                               "adapter","keyboard","mouse","tablet","camera","wire"]
+
+            if wt not in ["wet","dry","ewaste"]:
+                wt = "dry"
+
+            # Override if keywords clearly match
             if any(kw in detected_lower for kw in ewaste_keywords):
                 wt = "ewaste"
-                logging.info(f"Keyword override → ewaste (detected: {detected})")
+                logging.info(f"Keyword override → ewaste")
+            elif any(kw in detected_lower for kw in wet_keywords) and wt == "dry":
+                wt = "wet"
+                logging.info(f"Keyword override → wet")
 
             return self._build_result(wt, conf, detected, tip)
 

@@ -1,5 +1,5 @@
 """
-CLEANIFY - Full Backend (PostgreSQL version)
+Swachtha - Full Backend (PostgreSQL version)
 """
 
 from flask import Flask, request, jsonify, send_from_directory
@@ -111,7 +111,7 @@ def init_db():
     )""")
 
     ADMIN_EMAILS = [
-        ('Admin User',    'admin@cleanify.com',           'admin123', 'admin'),
+        ('Admin User',    'admin@Swachtha.com',           'admin123', 'admin'),
         ('Vamshi Poojary','vamshitharpoojary@gmail.com',  'admin123', 'admin'),
         ('Suprabha B',    'bsuprabha@gmail.com',          'admin123', 'admin'),
         ('Roshu',         'roshu042004@gmail.com',         'admin123', 'admin'),
@@ -228,7 +228,7 @@ def register():
 
     ALLOWED_ADMIN_EMAILS = [
         'vamshitharpoojary@gmail.com', 'bsuprabha@gmail.com',
-        'roshu042004@gmail.com', 'admin@cleanify.com'
+        'roshu042004@gmail.com', 'admin@Swachtha.com'
     ]
     if role == 'admin' and email not in ALLOWED_ADMIN_EMAILS:
         return jsonify({"error": "Admin registration is restricted."}), 403
@@ -631,5 +631,5 @@ except Exception as e:
     print(f"⚠️ DB init failed: {e}")
 
 if __name__ == '__main__':
-    print("🌿 CLEANIFY Backend starting on http://localhost:5000")
+    print("🌿 Swachtha Backend starting on http://localhost:5000")
     app.run(debug=False, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
