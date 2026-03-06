@@ -59,7 +59,7 @@ Respond ONLY with valid JSON, no markdown:
                 ]}],
                 "generationConfig": {
                     "temperature": 0.0,
-                    "maxOutputTokens": 150
+                    "maxOutputTokens": 512
                 }
             }).encode("utf-8")
 
