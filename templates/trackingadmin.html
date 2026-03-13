@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Live Tracking - Cleanify</title>
+    <link rel="stylesheet" href="./static/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #f0f9f0; margin: 0; }
+        .container { max-width: 700px; margin: 40px auto; padding: 20px; }
+        #map { height: 400px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); margin: 20px 0; z-index: 1; }
+        .card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .status-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+        .dot-active { background: #27ae60; animation: blink 1s infinite; }
+        .dot-inactive { background: #ccc; }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+        .btn { padding: 14px 32px; border: none; border-radius: 50px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s; }
+        .btn-start { background: linear-gradient(135deg,#1a7f44,#65a53b); color: white; box-shadow: 0 6px 20px rgba(26,127,68,0.4); }
+        .btn-stop  { background: linear-gradient(135deg,#e74c3c,#c0392b); color: white; box-shadow: 0 6px 20px rgba(231,76,60,0.4); }
+        .btn:hover { transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+        .info-row:last-child { border-bottom: none; }
+        .info-lbl { color: #888; }
+        .info-val { font-weight: 600; color: #1a7f44; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+            <h2 style="color:#1a7f44;margin:0;">📡 Live Tracking Control</h2>
+            <a href="./admin.html" style="color:#1a7f44;text-decoration:none;font-size:14px;">← Back to Dashboard</a>
+        </div>
+
+        <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                <div>
+                    <div style="font-size:16px;font-weight:600;margin-bottom:6px;">
+                        <span class="status-dot dot-inactive" id="statusDot"></span>
+                        <span id="statusText">Tracking Inactive</span>
+                    </div>
+                    <div style="font-size:13px;color:#888;">Your GPS location will be shared with citizens in real time</div>
+                </div>
+                <div style="display:flex;gap:10px;">
+                    <button class="btn btn-start" id="startBtn" onclick="startTracking()">📍 Start Tracking</button>
+                    <button class="btn btn-stop" id="stopBtn" onclick="stopTracking()" style="display:none;">⏹ Stop</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="card">
+            <h3 style="color:#1a7f44;margin:0 0 16px;">📊 Current Status</h3>
+            <div class="info-row"><span class="info-lbl">Latitude</span><span class="info-val" id="dispLat">—</span></div>
+            <div class="info-row"><span class="info-lbl">Longitude</span><span class="info-val" id="dispLng">—</span></div>
+            <div class="info-row"><span class="info-lbl">Last Updated</span><span class="info-val" id="dispTime">—</span></div>
+            <div class="info-row"><span class="info-lbl">Updates Sent</span><span class="info-val" id="dispCount">0</span></div>
+        </div>
+    </div>
+
+    <script>
+        const API = 'https://cleanify-6yh1.onrender.com';
+        function getToken() { return localStorage.getItem('cleanify_token'); }
+
+        // Redirect if not admin
+        if (!getToken() || localStorage.getItem('cleanify_role') !== 'admin') {
+            window.location.href = './index.html';
+        }
+
+        // Init map centered on India
+        const map = L.map('map').setView([15.3173, 75.7139], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Custom truck icon
+        const truckIcon = L.divIcon({
+            html: '<div style="font-size:32px;filter:drop-shadow(2px 4px 6px rgba(0,0,0,0.4));">🚛</div>',
+            className: '',
+            iconSize: [40, 40],
+            iconAnchor: [20, 20]
+        });
+
+        let marker = null;
+        let watchId = null;
+        let updateCount = 0;
+        let tracking = false;
+
+        function startTracking() {
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser.');
+                return;
+            }
+            tracking = true;
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'inline-block';
+            document.getElementById('statusDot').className = 'status-dot dot-active';
+            document.getElementById('statusText').textContent = 'Tracking Active — Sharing Location';
+
+            watchId = navigator.geolocation.watchPosition(
+                async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+
+                    // Update map
+                    if (!marker) {
+                        marker = L.marker([lat, lng], {icon: truckIcon}).addTo(map)
+                            .bindPopup('🚛 Waste Picker — You are here').openPopup();
+                    } else {
+                        marker.setLatLng([lat, lng]);
+                    }
+                    map.setView([lat, lng], 15);
+
+                    // Update info
+                    document.getElementById('dispLat').textContent = lat.toFixed(6);
+                    document.getElementById('dispLng').textContent = lng.toFixed(6);
+                    document.getElementById('dispTime').textContent = new Date().toLocaleTimeString('en-IN');
+                    document.getElementById('dispCount').textContent = ++updateCount;
+
+                    // Send to backend
+                    try {
+                        await fetch(`${API}/api/tracking/update`, {
+                            method: 'POST',
+                            headers: {'Content-Type':'application/json','Authorization':'Bearer '+getToken()},
+                            body: JSON.stringify({latitude: lat, longitude: lng, is_active: true})
+                        });
+                    } catch(e) { console.error('Update failed:', e); }
+                },
+                (err) => { alert('Location error: ' + err.message); stopTracking(); },
+                { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+            );
+        }
+
+        async function stopTracking() {
+            tracking = false;
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('statusDot').className = 'status-dot dot-inactive';
+            document.getElementById('statusText').textContent = 'Tracking Inactive';
+
+            await fetch(`${API}/api/tracking/stop`, {
+                method: 'POST',
+                headers: {'Authorization': 'Bearer ' + getToken()}
+            });
+        }
+
+        // Stop tracking if page closes
+        window.addEventListener('beforeunload', () => {
+            if (tracking) stopTracking();
+        });
+    </script>
+</body>
+</html>

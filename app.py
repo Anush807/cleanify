@@ -1,5 +1,5 @@
 """
-Swachtha - Full Backend (PostgreSQL version)
+CLEANIFY - Full Backend (PostgreSQL version)
 """
 
 from flask import Flask, request, jsonify, send_from_directory
@@ -29,7 +29,7 @@ app.secret_key = secrets.token_hex(32)
 
 # ── CORS ──
 CORS(app, supports_credentials=True,
-     origins=["https://swachtha.vercel.app/",
+     origins=["https://cleanify-frontend-eight.vercel.app",
                "http://localhost:5500", "http://127.0.0.1:5500"])
 
 @app.after_request
@@ -110,8 +110,25 @@ def init_db():
         FOREIGN KEY(user_id) REFERENCES users(id)
     )""")
 
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS tracker (
+        id INTEGER PRIMARY KEY DEFAULT 1,
+        admin_id INTEGER,
+        latitude REAL,
+        longitude REAL,
+        is_active BOOLEAN DEFAULT FALSE,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )""")
+
+    # Ensure single row exists
+    c.execute("""
+        INSERT INTO tracker (id, is_active)
+        VALUES (1, FALSE)
+        ON CONFLICT (id) DO NOTHING
+    """)
+
     ADMIN_EMAILS = [
-        ('Admin User',    'admin@Swachtha.com',           'admin123', 'admin'),
+        ('Admin User',    'admin@cleanify.com',           'admin123', 'admin'),
         ('Vamshi Poojary','vamshitharpoojary@gmail.com',  'admin123', 'admin'),
         ('Suprabha B',    'bsuprabha@gmail.com',          'admin123', 'admin'),
         ('Roshu',         'roshu042004@gmail.com',         'admin123', 'admin'),
@@ -228,7 +245,7 @@ def register():
 
     ALLOWED_ADMIN_EMAILS = [
         'vamshitharpoojary@gmail.com', 'bsuprabha@gmail.com',
-        'roshu042004@gmail.com', 'admin@Swachtha.com'
+        'roshu042004@gmail.com', 'admin@cleanify.com'
     ]
     if role == 'admin' and email not in ALLOWED_ADMIN_EMAILS:
         return jsonify({"error": "Admin registration is restricted."}), 403
@@ -543,6 +560,67 @@ def eco_purchase():
     return jsonify({"message": "Purchase recorded!", "total": total, "points_awarded": points_earned})
 
 # ─────────────────────────────────────────────
+# LIVE TRACKING
+# ─────────────────────────────────────────────
+
+@app.route('/api/tracking/update', methods=['POST'])
+@require_auth
+def update_tracking():
+    user = request.current_user
+    if user['role'] != 'admin':
+        return jsonify({'error': 'Admins only'}), 403
+    data = request.get_json()
+    lat = data.get('latitude')
+    lng = data.get('longitude')
+    is_active = data.get('is_active', True)
+    if lat is None or lng is None:
+        return jsonify({'error': 'latitude and longitude required'}), 400
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""
+        UPDATE tracker SET
+            admin_id = %s,
+            latitude = %s,
+            longitude = %s,
+            is_active = %s,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = 1
+    """, (user['id'], lat, lng, is_active))
+    conn.commit()
+    c.close(); conn.close()
+    return jsonify({'success': True, 'lat': lat, 'lng': lng})
+
+@app.route('/api/tracking/location', methods=['GET'])
+@require_auth
+def get_tracking():
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT latitude, longitude, is_active, updated_at, admin_id FROM tracker WHERE id=1")
+    row = c.fetchone()
+    c.close(); conn.close()
+    if not row or not row[2]:
+        return jsonify({'is_active': False, 'message': 'Tracker not active'})
+    return jsonify({
+        'is_active': True,
+        'latitude': row[0],
+        'longitude': row[1],
+        'updated_at': row[3].isoformat() if row[3] else None
+    })
+
+@app.route('/api/tracking/stop', methods=['POST'])
+@require_auth
+def stop_tracking():
+    user = request.current_user
+    if user['role'] != 'admin':
+        return jsonify({'error': 'Admins only'}), 403
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("UPDATE tracker SET is_active=FALSE WHERE id=1")
+    conn.commit()
+    c.close(); conn.close()
+    return jsonify({'success': True})
+
+# ─────────────────────────────────────────────
 # SCHEDULE
 # ─────────────────────────────────────────────
 
@@ -631,5 +709,5 @@ except Exception as e:
     print(f"⚠️ DB init failed: {e}")
 
 if __name__ == '__main__':
-    print("🌿 Swachtha Backend starting on http://localhost:5000")
-    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+    print("🌿 CLEANIFY Backend starting on http://localhost:5000")
+    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
