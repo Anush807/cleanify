@@ -11,6 +11,10 @@ import hashlib
 import secrets
 import re
 import tempfile
+import smtplib
+import threading
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from datetime import datetime, timedelta
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -150,6 +154,115 @@ def init_db():
 def hash_password(pwd):
     return hashlib.sha256(pwd.encode()).hexdigest()
 
+# ─────────────────────────────────────────────
+# EMAIL
+# ─────────────────────────────────────────────
+
+def send_welcome_email(to_email, fullname):
+    """Send welcome email in a background thread so it doesn't slow down the response."""
+    def _send():
+        gmail_user     = os.environ.get('GMAIL_USER', '')
+        gmail_password = os.environ.get('GMAIL_APP_PASSWORD', '')
+        if not gmail_user or not gmail_password:
+            print("⚠️  GMAIL_USER or GMAIL_APP_PASSWORD not set — skipping email")
+            return
+        try:
+            msg = MIMEMultipart('alternative')
+            msg['Subject'] = '🌿 Welcome to CLEANIFY — Registration Successful!'
+            msg['From']    = f'CLEANIFY 🌿 <{gmail_user}>'
+            msg['To']      = to_email
+
+            html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background:#f0f9f0;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f9f0;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:white;border-radius:20px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.1);max-width:600px;width:100%;">
+
+        <!-- Header -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#1a7f44,#65a53b);padding:40px;text-align:center;">
+            <div style="font-size:48px;margin-bottom:10px;">🌿</div>
+            <h1 style="color:white;margin:0;font-size:28px;font-weight:800;letter-spacing:1px;">CLEANIFY</h1>
+            <p style="color:rgba(255,255,255,0.85);margin:8px 0 0;font-size:14px;">Clean India, Green India</p>
+          </td>
+        </tr>
+
+        <!-- Body -->
+        <tr>
+          <td style="padding:40px;">
+            <h2 style="color:#1a7f44;margin:0 0 16px;font-size:22px;">Welcome, {fullname}! 🎉</h2>
+            <p style="color:#444;line-height:1.7;margin:0 0 20px;font-size:15px;">
+              Your registration was <strong>successful</strong>! You are now part of the Swachh Bharat movement.
+              Together we can build a cleaner, greener India.
+            </p>
+
+            <!-- What you can do -->
+            <div style="background:#f9fdf9;border-radius:12px;padding:24px;margin-bottom:24px;border-left:4px solid #1a7f44;">
+              <h3 style="color:#1a7f44;margin:0 0 16px;font-size:16px;">What you can do with CLEANIFY:</h3>
+              <table cellpadding="0" cellspacing="0" width="100%">
+                <tr><td style="padding:6px 0;font-size:14px;color:#444;">📋 &nbsp;Report waste dumping and cleanliness issues</td></tr>
+                <tr><td style="padding:6px 0;font-size:14px;color:#444;">🤖 &nbsp;Use AI to classify your waste (Dry / Wet / E-Waste)</td></tr>
+                <tr><td style="padding:6px 0;font-size:14px;color:#444;">🚛 &nbsp;Track your waste picker in real time</td></tr>
+                <tr><td style="padding:6px 0;font-size:14px;color:#444;">🏆 &nbsp;Earn Green Points and unlock badges</td></tr>
+                <tr><td style="padding:6px 0;font-size:14px;color:#444;">🛒 &nbsp;Shop eco-friendly products and earn rewards</td></tr>
+              </table>
+            </div>
+
+            <!-- CTA Button -->
+            <div style="text-align:center;margin:28px 0;">
+              <a href="https://swachtha.vercel.app" 
+                 style="display:inline-block;padding:14px 40px;background:linear-gradient(135deg,#1a7f44,#65a53b);color:white;text-decoration:none;border-radius:50px;font-size:16px;font-weight:700;box-shadow:0 6px 20px rgba(26,127,68,0.35);">
+                🌿 Go to CLEANIFY
+              </a>
+            </div>
+
+            <!-- Green Points Welcome Bonus -->
+            <div style="background:linear-gradient(135deg,#e8ffe8,#c8f0c8);border-radius:12px;padding:16px;text-align:center;margin-bottom:24px;">
+              <div style="font-size:28px;">🌟</div>
+              <p style="margin:6px 0 0;color:#1a7f44;font-weight:700;font-size:15px;">You've joined the Green Revolution!</p>
+              <p style="margin:4px 0 0;color:#444;font-size:13px;">Start reporting issues to earn your first Green Points.</p>
+            </div>
+
+            <p style="color:#888;font-size:13px;line-height:1.6;margin:0;">
+              If you did not create this account, please ignore this email or contact us.
+            </p>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="background:#f9fdf9;padding:24px;text-align:center;border-top:1px solid #e8f5e9;">
+            <p style="color:#aaa;font-size:12px;margin:0;">© 2026 Swachhta Platform — Built for a Clean India 🇮🇳</p>
+            <p style="color:#aaa;font-size:12px;margin:6px 0 0;">
+              <a href="https://swachtha.vercel.app" style="color:#1a7f44;text-decoration:none;">swachtha.vercel.app</a>
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>"""
+
+            msg.attach(MIMEText(html, 'html'))
+
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+                server.login(gmail_user, gmail_password)
+                server.sendmail(gmail_user, to_email, msg.as_string())
+            print(f"✅ Welcome email sent to {to_email}")
+        except Exception as e:
+            print(f"⚠️  Email send failed: {e}")
+
+    # Run in background thread — doesn't block the API response
+    threading.Thread(target=_send, daemon=True).start()
+
 def create_session(user_id):
     token = secrets.token_hex(32)
     expires = datetime.now() + timedelta(days=7)
@@ -265,6 +378,8 @@ def register():
         user_id = c.fetchone()['id']
         token = create_session(user_id)
         c.close(); conn.close()
+        # Send welcome email in background
+        send_welcome_email(email, fullname)
         return jsonify({"message": "Account created!", "token": token, "role": role}), 201
     except Exception as e:
         c.close(); conn.close()
@@ -619,6 +734,71 @@ def stop_tracking():
     conn.commit()
     c.close(); conn.close()
     return jsonify({'success': True})
+
+# ─────────────────────────────────────────────
+# CHATBOT
+# ─────────────────────────────────────────────
+
+@app.route('/api/chat', methods=['POST'])
+@require_auth
+def chat():
+    data = request.get_json()
+    user_message = data.get('message', '').strip()
+    history = data.get('history', [])  # [{role, content}]
+
+    if not user_message:
+        return jsonify({'error': 'Message is required'}), 400
+
+    api_key = os.environ.get('GEMINI_API_KEY', '')
+    if not api_key:
+        return jsonify({'error': 'Chatbot not configured on server'}), 500
+
+    try:
+        system_prompt = """You are Swachh Assistant, the friendly AI chatbot for CLEANIFY — a waste management and cleanliness platform for India's Swachh Bharat mission.
+
+You help citizens with:
+- Waste management tips (wet, dry, e-waste segregation)
+- How to report cleanliness issues (dumping, washrooms, drains)
+- Information about the Cleanify app features
+- Eco-friendly living tips
+- Green points and rewards system
+- How to use the AI waste classifier
+- Pickup schedules and waste picker tracking
+- General sanitation and hygiene advice
+
+Keep responses concise, friendly, and practical. Use simple English. Occasionally use relevant emojis.
+If asked about something unrelated to waste, cleanliness, or the app, politely redirect to your area of expertise.
+Never make up specific local data — suggest the user check their municipality website for area-specific info."""
+
+        # Build contents array with history
+        contents = []
+        for msg in history[-10:]:  # last 10 messages for context
+            role = 'user' if msg['role'] == 'user' else 'model'
+            contents.append({'role': role, 'parts': [{'text': msg['content']}]})
+        contents.append({'role': 'user', 'parts': [{'text': user_message}]})
+
+        payload = json.dumps({
+            'system_instruction': {'parts': [{'text': system_prompt}]},
+            'contents': contents,
+            'generationConfig': {
+                'temperature': 0.7,
+                'maxOutputTokens': 400
+            }
+        }).encode('utf-8')
+
+        import urllib.request
+        url = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}'
+        req = urllib.request.Request(url, data=payload,
+                                     headers={'Content-Type': 'application/json'}, method='POST')
+        with urllib.request.urlopen(req, timeout=20) as response:
+            result = json.loads(response.read().decode('utf-8'))
+
+        reply = result['candidates'][0]['content']['parts'][0]['text'].strip()
+        return jsonify({'reply': reply})
+
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        return jsonify({'error': f'Chatbot error: {str(e)}'}), 500
 
 # ─────────────────────────────────────────────
 # SCHEDULE

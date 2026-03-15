@@ -59,6 +59,27 @@
 
         <!-- SECTION: DASHBOARD -->
         <div class="page-section active" id="section-dashboard">
+
+            <!-- LIVE TRACKING TOGGLE -->
+            <div id="trackingCard" style="background:white;border-radius:16px;padding:20px 24px;box-shadow:0 4px 15px rgba(0,0,0,0.08);margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;border-left:5px solid #1a7f44;">
+                <div style="display:flex;align-items:center;gap:14px;">
+                    <div style="font-size:2.2rem;">📡</div>
+                    <div>
+                        <div style="font-weight:700;font-size:15px;color:#1a2e1a;">Live Location Sharing</div>
+                        <div style="font-size:13px;color:#888;margin-top:3px;" id="trackingStatusText">Share your GPS location with citizens in real time</div>
+                        <div style="margin-top:6px;display:flex;align-items:center;gap:6px;">
+                            <span id="trackingDot" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#ccc;"></span>
+                            <span id="trackingLabel" style="font-size:12px;color:#888;">Inactive</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:center;">
+                    <button id="trackingToggleBtn" onclick="toggleTracking()" style="padding:12px 28px;border:none;border-radius:50px;font-size:14px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#1a7f44,#65a53b);color:white;box-shadow:0 4px 15px rgba(26,127,68,0.3);transition:all 0.3s;">
+                        📍 Start Sharing
+                    </button>
+                </div>
+            </div>
+
             <!-- STATS -->
             <div class="stats-grid">
                 <div class="stat-card total">
@@ -919,6 +940,95 @@
             loadAdminProfile();
             loadComplaints();
         });
+
+        // ── LIVE TRACKING ──
+        let trackingActive = false;
+        let watchId = null;
+        let trackingInterval = null;
+
+        async function toggleTracking() {
+            if (!trackingActive) {
+                startTracking();
+            } else {
+                stopTracking();
+            }
+        }
+
+        function startTracking() {
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser.');
+                return;
+            }
+            const btn = document.getElementById('trackingToggleBtn');
+            btn.textContent = '⏳ Getting location...';
+            btn.disabled = true;
+
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    trackingActive = true;
+                    btn.textContent = '⏹ Stop Sharing';
+                    btn.style.background = 'linear-gradient(135deg,#e74c3c,#c0392b)';
+                    btn.style.boxShadow  = '0 4px 15px rgba(231,76,60,0.3)';
+                    btn.disabled = false;
+
+                    const dot = document.getElementById('trackingDot');
+                    dot.style.background  = '#27ae60';
+                    dot.style.animation   = 'blink 1s infinite';
+                    document.getElementById('trackingLabel').textContent = '🟢 Live — sharing location';
+                    document.getElementById('trackingStatusText').textContent = 'Citizens can now see your location on their dashboard';
+
+                    // Send immediately + then every 10s
+                    await sendLocation(pos.coords.latitude, pos.coords.longitude);
+                    watchId = navigator.geolocation.watchPosition(
+                        async (p) => await sendLocation(p.coords.latitude, p.coords.longitude),
+                        (err) => console.error('GPS error:', err),
+                        { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+                    );
+                },
+                (err) => {
+                    alert('Could not get location: ' + err.message);
+                    btn.textContent = '📍 Start Sharing';
+                    btn.disabled = false;
+                },
+                { enableHighAccuracy: true, timeout: 15000 }
+            );
+        }
+
+        async function sendLocation(lat, lng) {
+            try {
+                await fetch(`${API}/api/tracking/update`, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json','Authorization':'Bearer '+getToken()},
+                    body: JSON.stringify({ latitude: lat, longitude: lng, is_active: true })
+                });
+                const t = new Date().toLocaleTimeString('en-IN');
+                document.getElementById('trackingLabel').textContent = `🟢 Live · Last sent ${t}`;
+            } catch(e) { console.error('Location send failed:', e); }
+        }
+
+        async function stopTracking() {
+            trackingActive = false;
+            if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+
+            const btn = document.getElementById('trackingToggleBtn');
+            btn.textContent = '📍 Start Sharing';
+            btn.style.background = 'linear-gradient(135deg,#1a7f44,#65a53b)';
+            btn.style.boxShadow  = '0 4px 15px rgba(26,127,68,0.3)';
+
+            const dot = document.getElementById('trackingDot');
+            dot.style.background = '#ccc';
+            dot.style.animation  = 'none';
+            document.getElementById('trackingLabel').textContent      = 'Inactive';
+            document.getElementById('trackingStatusText').textContent = 'Share your GPS location with citizens in real time';
+
+            await fetch(`${API}/api/tracking/stop`, {
+                method: 'POST',
+                headers: {'Authorization': 'Bearer ' + getToken()}
+            });
+        }
+
+        // Stop when page closes
+        window.addEventListener('beforeunload', () => { if (trackingActive) stopTracking(); });
     </script>
 </body>
 </html>
