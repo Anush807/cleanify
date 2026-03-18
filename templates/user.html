@@ -99,21 +99,22 @@
         <div id="trackerWidget" style="display:none;margin-bottom:24px;">
             <h3 style="color:#1a7f44;margin-bottom:12px;">📡 Waste Picker — Live Location</h3>
             <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.08);">
-                <div style="padding:14px 20px;background:linear-gradient(135deg,#1a7f44,#65a53b);color:white;display:flex;align-items:center;justify-content:space-between;">
+                <div style="padding:14px 20px;background:linear-gradient(135deg,#1a7f44,#65a53b);color:white;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
                     <div style="display:flex;align-items:center;gap:8px;">
-                        <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#a8e6b0;animation:blink 1s infinite;"></span>
+                        <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#a8e6b0;animation:blink 1s infinite;flex-shrink:0;"></span>
                         <span style="font-size:14px;font-weight:600;">Live — Waste Picker is Active</span>
                     </div>
                     <span id="trackerTime" style="font-size:12px;opacity:0.85;">—</span>
                 </div>
-                <div id="userMap" style="height:280px;z-index:1;"></div>
-                <div style="padding:14px 20px;display:flex;gap:20px;flex-wrap:wrap;">
+                <!-- Map MUST have explicit height and not be inside a hidden parent when initialized -->
+                <div id="userMap" style="height:300px;width:100%;z-index:1;background:#e8f5e9;"></div>
+                <div style="padding:14px 20px;display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
                     <div style="text-align:center;">
-                        <div style="font-size:1.2rem;font-weight:700;color:#1a7f44;" id="trackerDist">—</div>
+                        <div style="font-size:1.1rem;font-weight:700;color:#1a7f44;" id="trackerDist">—</div>
                         <div style="font-size:11px;color:#888;">Distance</div>
                     </div>
                     <div style="text-align:center;">
-                        <div style="font-size:1.2rem;font-weight:700;color:#1a7f44;" id="trackerEta">—</div>
+                        <div style="font-size:1.1rem;font-weight:700;color:#1a7f44;" id="trackerEta">—</div>
                         <div style="font-size:11px;color:#888;">Est. Arrival</div>
                     </div>
                     <div style="margin-left:auto;">
@@ -218,93 +219,125 @@
         });
 
         // ── LIVE TRACKER ON DASHBOARD ──
-        let userMap = null;
+        let userMap     = null;
         let truckMarker = null;
         let homeMarker  = null;
         let userCoords  = null;
         let routeLine   = null;
+        let mapReady    = false;
 
-        function getDistanceKm(lat1,lng1,lat2,lng2){
-            const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
-            const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
-            return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+        function getDistanceKm(lat1, lng1, lat2, lng2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2)**2 +
+                      Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) *
+                      Math.sin(dLng/2)**2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
 
         function initTracker() {
-            // Get user GPS silently
+            // Silently get user GPS
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    userCoords = [pos.coords.latitude, pos.coords.longitude];
-                });
+                navigator.geolocation.getCurrentPosition(
+                    pos => { userCoords = [pos.coords.latitude, pos.coords.longitude]; },
+                    () => {} // ignore error
+                );
             }
-            // Poll immediately then every 10s
             pollTracker();
             setInterval(pollTracker, 10000);
+        }
+
+        function showWidget(lat, lng, updatedAt) {
+            const widget = document.getElementById('trackerWidget');
+
+            // Make widget visible FIRST before initializing map
+            if (widget.style.display === 'none') {
+                widget.style.display = 'block';
+            }
+
+            // Update header time
+            document.getElementById('trackerTime').textContent =
+                'Updated ' + new Date(updatedAt).toLocaleTimeString('en-IN');
+
+            // Init Leaflet map — only after widget is visible in DOM
+            if (!mapReady) {
+                mapReady = true;
+                // Small delay ensures the div has rendered with its dimensions
+                setTimeout(() => {
+                    userMap = L.map('userMap', { zoomControl: true }).setView([lat, lng], 15);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors',
+                        maxZoom: 19
+                    }).addTo(userMap);
+
+                    const truckIcon = L.divIcon({
+                        html: '<div style="font-size:32px;line-height:1;">🚛</div>',
+                        className: '', iconSize: [38, 38], iconAnchor: [19, 19]
+                    });
+                    truckMarker = L.marker([lat, lng], { icon: truckIcon })
+                        .addTo(userMap)
+                        .bindPopup('<b>🚛 Waste Picker</b><br>Live location')
+                        .openPopup();
+
+                    if (userCoords) {
+                        const homeIcon = L.divIcon({
+                            html: '<div style="font-size:28px;line-height:1;">🏠</div>',
+                            className: '', iconSize: [32, 32], iconAnchor: [16, 16]
+                        });
+                        homeMarker = L.marker(userCoords, { icon: homeIcon })
+                            .addTo(userMap)
+                            .bindPopup('🏠 Your Location');
+                        drawRoute(lat, lng);
+                    }
+
+                    // Force Leaflet to recalculate container size
+                    userMap.invalidateSize();
+                }, 100);
+            } else {
+                // Map already initialized — just move marker
+                truckMarker.setLatLng([lat, lng]);
+                userMap.setView([lat, lng], 15);
+                userMap.invalidateSize();
+                drawRoute(lat, lng);
+            }
+
+            // Distance & ETA
+            if (userCoords) {
+                const dist = getDistanceKm(userCoords[0], userCoords[1], lat, lng);
+                document.getElementById('trackerDist').textContent =
+                    dist < 1 ? `${Math.round(dist * 1000)} m` : `${dist.toFixed(1)} km`;
+                const eta = Math.round((dist / 15) * 60);
+                document.getElementById('trackerEta').textContent =
+                    eta < 1 ? 'Arriving now!' : `~${eta} min`;
+            }
+        }
+
+        function drawRoute(lat, lng) {
+            if (!userMap || !userCoords) return;
+            if (routeLine) userMap.removeLayer(routeLine);
+            routeLine = L.polyline([[lat, lng], userCoords], {
+                color: '#1a7f44', weight: 3, dashArray: '8, 6', opacity: 0.7
+            }).addTo(userMap);
         }
 
         async function pollTracker() {
             try {
                 const res = await fetch(`${API}/api/tracking/location`, {
-                    headers: {'Authorization': 'Bearer ' + getToken()}
+                    headers: { 'Authorization': 'Bearer ' + getToken() }
                 });
+                if (res.status === 401) { window.location.href = './index.html'; return; }
                 const data = await res.json();
 
-                if (!data.is_active) {
+                if (!data.is_active || !data.latitude || !data.longitude) {
                     document.getElementById('trackerWidget').style.display = 'none';
                     return;
                 }
 
-                // Show widget
-                document.getElementById('trackerWidget').style.display = 'block';
-                document.getElementById('trackerTime').textContent =
-                    'Updated ' + new Date(data.updated_at).toLocaleTimeString('en-IN');
+                showWidget(data.latitude, data.longitude, data.updated_at);
 
-                const lat = data.latitude;
-                const lng = data.longitude;
-
-                // Init map once
-                if (!userMap) {
-                    userMap = L.map('userMap').setView([lat, lng], 14);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '© OpenStreetMap'
-                    }).addTo(userMap);
-
-                    const truckIcon = L.divIcon({
-                        html: '<div style="font-size:30px;filter:drop-shadow(2px 4px 4px rgba(0,0,0,0.3));">🚛</div>',
-                        className:'', iconSize:[36,36], iconAnchor:[18,18]
-                    });
-                    truckMarker = L.marker([lat,lng],{icon:truckIcon})
-                        .addTo(userMap).bindPopup('🚛 Waste Picker').openPopup();
-
-                    if (userCoords) {
-                        const homeIcon = L.divIcon({
-                            html:'<div style="font-size:26px;">🏠</div>',
-                            className:'', iconSize:[30,30], iconAnchor:[15,15]
-                        });
-                        homeMarker = L.marker(userCoords,{icon:homeIcon})
-                            .addTo(userMap).bindPopup('🏠 Your Location');
-                    }
-                } else {
-                    truckMarker.setLatLng([lat, lng]);
-                    userMap.setView([lat, lng], 14);
-                }
-
-                // Dashed line between truck and user
-                if (userCoords) {
-                    if (routeLine) userMap.removeLayer(routeLine);
-                    routeLine = L.polyline([[lat,lng], userCoords], {
-                        color:'#1a7f44', weight:3, dashArray:'8,6', opacity:0.7
-                    }).addTo(userMap);
-
-                    const dist = getDistanceKm(userCoords[0],userCoords[1],lat,lng);
-                    document.getElementById('trackerDist').textContent =
-                        dist < 1 ? `${Math.round(dist*1000)} m` : `${dist.toFixed(1)} km`;
-                    const eta = Math.round((dist/15)*60);
-                    document.getElementById('trackerEta').textContent =
-                        eta < 1 ? 'Arriving now!' : `~${eta} min`;
-                }
             } catch(e) {
-                document.getElementById('trackerWidget').style.display = 'none';
+                console.error('Tracker poll error:', e);
             }
         }
     </script>
@@ -546,11 +579,14 @@
         }
 
         function formatReply(text) {
-            // Convert **bold** and newlines to HTML
-            return escapeHtml(text)
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/  /g, '<br>');
-        }
+    let out = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
+    return out;
+}
 
         // Show unread badge after 3 seconds on first load
         setTimeout(() => {
